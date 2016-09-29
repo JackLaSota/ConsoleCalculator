@@ -1,8 +1,8 @@
 # =========== #
 # Build Files #
 # =========== #
-/ConsoleCalculator/bin/
-/ConsoleCalculator/obj/
+/ConsoleCalculator/ConsoleCalculator/bin/
+/ConsoleCalculator/ConsoleCalculator/obj/
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
