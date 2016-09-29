@@ -1,9 +1,11 @@
 using JetBrains.Annotations;
 
-namespace ConsoleCalculator {
+namespace ConsoleCalculator.CalculatorLanguage {
 	/// <summary> Represents (ax + b) </summary>
 	public partial struct LinearInX {
+		/// <summary> Coefficient of x. </summary>
 		public float a;
+		/// <summary> Constant offset. </summary>
 		public float b;
 		[Pure] public static explicit operator string (LinearInX toCast) {
 			return "(" + toCast.a + "x + " + toCast.b + ")";
