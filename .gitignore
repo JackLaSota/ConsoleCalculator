@@ -1,0 +1,34 @@
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+/ConsoleCalculator/[Ee]xported[Oo]bj/
+/ConsoleCalculator/*.userprefs
+/ConsoleCalculator/*.csproj
+/ConsoleCalculator/*.pidb
+/ConsoleCalculator/*.suo
+/ConsoleCalculator/.vs/ConsoleCalculator/v14/.suo
+/ConsoleCalculator/*.sln*
+/ConsoleCalculator/*.user
+/ConsoleCalculator/*.unityproj
+/ConsoleCalculator/*.booproj
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store*
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+[Tt]humbs.db
+
+# ================= #
+#      NCrunch      #
+# ================= #
+#Cached data such as test results and code coverage information.
+/ConsoleCalculator/_NCrunch_ConsoleCalculator/
+#User preferences specific to the solution, such as column/filter arrangements within tool windows and the currently selected engine mode.
+/ConsoleCalculator/ConsoleCalculator.ncrunchsolution.user
+#Temporary generated files used when NCrunch is loading projects. Under normal circumstances, these are automatically removed and should rarely be seen. Otherwise, they can usually be safely deleted
+/ConsoleCalculator/nCrunchTemp_*
