@@ -1,3 +1,9 @@
+# =========== #
+# Build Files #
+# =========== #
+/ConsoleCalculator/bin/
+/ConsoleCalculator/obj/
+
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
@@ -23,9 +29,9 @@ Icon?
 ehthumbs.db
 [Tt]humbs.db
 
-# ================= #
-#      NCrunch      #
-# ================= #
+# ======= #
+# NCrunch #
+# ======= #
 #Cached data such as test results and code coverage information.
 /ConsoleCalculator/_NCrunch_ConsoleCalculator/
 #User preferences specific to the solution, such as column/filter arrangements within tool windows and the currently selected engine mode.
