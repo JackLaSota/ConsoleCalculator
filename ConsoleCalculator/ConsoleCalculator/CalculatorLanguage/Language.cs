@@ -10,7 +10,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 	public static partial class Language {
 		public static readonly Cfg grammar;
 		static Language () {grammar = CreateGrammar();}//This is in a static constructor to ensure it's executed after the symbol and production fields are initialized.
-		static Cfg CreateGrammar () {return new Cfg(IncludedFieldValuesOfType<ISymbol>(), IncludedFieldValuesOfType<CfgProduction>());}
+		static Cfg CreateGrammar () {return new Cfg(IncludedFieldValuesOfType<ISymbol>(), startSymbol, IncludedFieldValuesOfType<CfgProduction>());}
 		[AttributeUsage(AttributeTargets.Field)] public class IncludedInGrammarAttribute : Attribute {}
 		static IEnumerable<FieldInfo> IncludedFields {
 			get {

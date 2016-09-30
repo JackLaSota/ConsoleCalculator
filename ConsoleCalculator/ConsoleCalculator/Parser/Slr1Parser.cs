@@ -1,18 +1,48 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ConsoleCalculator.Parser.Automaton;
 using ConsoleCalculator.Parser.Language;
+using ConsoleCalculator.Utilities;
 
 namespace ConsoleCalculator.Parser {
 	/// <summary> Immutable. </summary>
-	public class Slr1Parser <TSemanticTreeNode> {
+	public partial class Slr1Parser <TSemanticTreeNode> {
 		readonly Cfg cfg;
-		readonly Dfa<Lr0Item, ISymbol, bool>.TimelessSpec dfaSpec;
+		readonly Dfa<List<Lr0Item>, ISymbol, bool>.TimelessSpec dfaSpec;
 		readonly GetLexemeSemanticsDelegate getLexemeSemantics;
 		readonly GetNonterminalSemanticsDelegate getNonterminalSemantics;
 		readonly LexDelegate lex;
-		public static Dfa<Lr0Item, ISymbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {
-			throw new NotImplementedException();
+		public static IEnumerable<Lr0Item> ItemsFor (Cfg cfg) {
+			return cfg.productions.SelectMany(ItemsFor);
+		}
+		static IEnumerable<Lr0Item> StartItemsFor (Cfg cfg) {
+			return ItemsFromFreshExpansionOfSymbol(cfg, cfg.startSymbol);
+		}
+		static IEnumerable<Lr0Item> ItemsFromFreshExpansionOfSymbol (Cfg cfg, Nonterminal symbol) {
+			return cfg.productions.Where(production => production.reagent == symbol).Select(FirstItemFor);
+		}
+		static Lr0Item FirstItemFor (CfgProduction production) {return new Lr0Item(production, 0);}
+		static IEnumerable<Lr0Item> ItemsFor (CfgProduction production) {
+			return Enumerable.Range(0, production.product.Count).Select(index => new Lr0Item(production, index));
+		}
+		static IEnumerable<Lr0Item> TransitionsFunction (Cfg cfg, Lr0Item startItem, ISymbol input) {
+			return startItem.Continuation.AsSingletonOrEmpty()
+				.Concat(ReachableWithEmptyTokenStringFrom(cfg, startItem).Where(item => item.NextSymbol == input));
+		}
+		static IEnumerable<Lr0Item> ReachableWithEmptyTokenStringFrom (Cfg cfg, Lr0Item startItem) {
+			return startItem.Closure(item => ReachableWithOneEmptyTokenStringStepFrom(cfg, item), true);
+		}
+		static IEnumerable<Lr0Item> ReachableWithOneEmptyTokenStringStepFrom (Cfg cfg, Lr0Item startItem) {
+			return (startItem.NextSymbol as Nonterminal).AsSingletonOrEmpty()
+				.SelectMany(nonterminal => ItemsFromFreshExpansionOfSymbol(cfg, nonterminal));
+		}
+		public static Dfa<List<Lr0Item>, ISymbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {
+			var items = ItemsFor(cfg).ToList();
+			var inputDomain = cfg.symbols;
+			//null Lr0Item represents state of invalid prefix.
+			return new NfaTimelessSpec<Lr0Item, ISymbol, bool>(items, items.First()/*dummy.*/, (startItem, input) => TransitionsFunction(cfg, startItem, input), inputDomain, state => state != null)
+				.DeterministicEquivalent(StartItemsFor(cfg).ToList(), possibleStates => possibleStates.Any(state => state != null));
 		}
 		public delegate IEnumerable<Lexeme> LexDelegate (string input);
 		public delegate TSemanticTreeNode GetLexemeSemanticsDelegate (Lexeme lexeme);
@@ -24,43 +54,6 @@ namespace ConsoleCalculator.Parser {
 			this.lex = lex;
 			dfaSpec = DfaSpecFor(cfg);
 		}
-		public class StackEntry {
-			public readonly Dfa<Lr0Item, ISymbol, bool> stackSoFarValidityAsPrefixClassifier;
-			public readonly TSemanticTreeNode meaning;
-			public readonly ISymbol symbol;
-			public StackEntry (
-				Dfa<Lr0Item, ISymbol, bool> stackSoFarValidityAsPrefixClassifier,
-				TSemanticTreeNode meaning,
-				ISymbol symbol
-			) {
-				this.stackSoFarValidityAsPrefixClassifier = stackSoFarValidityAsPrefixClassifier;
-				this.meaning = meaning;
-				this.symbol = symbol;
-			}
-		}
-		class Run {
-			public readonly Slr1Parser<TSemanticTreeNode> parser;
-			readonly List<StackEntry> stack;
-			IEnumerator<Lexeme> inputStream;
-			public Run (Slr1Parser<TSemanticTreeNode> parser, IEnumerable<Lexeme> lexedInput) {
-				this.parser = parser;
-				inputStream = lexedInput.GetEnumerator();
-				stack = new List<StackEntry> ();
-			}
-			public void Shift (Lexeme lexeme) {throw new NotImplementedException();}
-			public void ReduceBy (CfgProduction production) {throw new NotImplementedException();}
-			public TSemanticTreeNode Execute () {
-				while (inputStream.MoveNext()) {
-					throw new NotImplementedException();
-				}
-				throw new NotImplementedException();
-			}
-		}
-		public TSemanticTreeNode Parse (string input, Func<string, IEnumerable<Lexeme>> lex) {
-			return Parse(lex(input));
-		}
-		TSemanticTreeNode Parse (IEnumerable<Lexeme> lexedInput) {
-			return new Run(this, lexedInput).Execute();
-		}
+		public TSemanticTreeNode Parse (string input) {return new Run(this, lex(input)).Execute();}
 	}
 }

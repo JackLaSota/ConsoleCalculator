@@ -13,7 +13,7 @@ namespace ConsoleCalculator {
 				if (input == null) continue;
 				if (input.Contains("exit")) return;
 				try {
-					var parsedInput = parser.Parse(input, Language.Lex);
+					var parsedInput = parser.Parse(input);
 					var expression = parsedInput as LinearExpressionInX; if (expression != null) {
 						Console.WriteLine(expression.ComputeValue());
 					}
