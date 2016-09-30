@@ -15,7 +15,7 @@ namespace ConsoleCalculator.Parser {
 		public ISymbol NextSymbol => cfgProduction.product[nextProductIndex];
 		public Lr0Item Continuation => nextProductIndex == cfgProduction.product.Count - 1 ? null : new Lr0Item(cfgProduction, nextProductIndex + 1);
 		[Pure] public static bool operator == (Lr0Item left, Lr0Item right) {
-			if (left == null || right == null) return left == null && right == null;
+			if ((object) left == null || (object) right == null) return (object) left == null && (object) right == null;
 			return left.cfgProduction == right.cfgProduction && left.nextProductIndex == right.nextProductIndex;
 		}
 		[Pure] public static bool operator != (Lr0Item left, Lr0Item right) {return !(left == right);}
@@ -25,5 +25,6 @@ namespace ConsoleCalculator.Parser {
 			return lr0Item != null && this == lr0Item;
 		}
 		[Pure] public override int GetHashCode () {return 19381 * cfgProduction.GetHashCode() + 73459 * nextProductIndex.GetHashCode();}
+		public bool CanBeCompletedBy (ISymbol symbol) {return nextProductIndex == cfgProduction.product.Count && NextSymbol == symbol;}
 	}
 }

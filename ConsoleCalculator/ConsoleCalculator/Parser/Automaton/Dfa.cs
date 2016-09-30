@@ -6,8 +6,8 @@ namespace ConsoleCalculator.Parser.Automaton {
 	/// <typeparam name="TInput"> Input type. </typeparam>
 	/// <typeparam name="TOutput"> Output type. </typeparam>
 	public partial class Dfa <TState, TInput, TOutput> where TState : class {
-		TimelessSpec timelessSpec;
-		TState currentState;
+		readonly TimelessSpec timelessSpec;
+		public readonly TState currentState;
 		public Dfa (TimelessSpec timelessSpec) : this(timelessSpec, timelessSpec.startState) {}
 		public Dfa (TimelessSpec timelessSpec, TState currentState) {
 			this.timelessSpec = timelessSpec;

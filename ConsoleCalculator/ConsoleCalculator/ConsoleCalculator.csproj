@@ -90,6 +90,9 @@
     <Compile Include="CalculatorLanguage\LinearEquationInX.cs" />
     <Compile Include="CalculatorLanguage\LinearExpressionsInX\LinearExpressionInX.cs" />
     <Compile Include="Parser\ParseError\ParseError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedContinuedInputError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedEndOfInputError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedLexemeError.cs" />
     <Compile Include="Parser\Slr1Parser.cs" />
     <Compile Include="CalculatorLanguage\SemanticTreeNode.cs" />
     <Compile Include="Parser\Slr1Parser.Run.cs" />

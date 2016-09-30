@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Automaton;
@@ -7,7 +6,7 @@ using ConsoleCalculator.Utilities;
 
 namespace ConsoleCalculator.Parser {
 	/// <summary> Immutable. </summary>
-	public partial class Slr1Parser <TSemanticTreeNode> {
+	public partial class Slr1Parser <TSemanticTreeNode> where TSemanticTreeNode : class {
 		readonly Cfg cfg;
 		readonly Dfa<List<Lr0Item>, ISymbol, bool>.TimelessSpec dfaSpec;
 		readonly GetLexemeSemanticsDelegate getLexemeSemantics;
@@ -41,8 +40,8 @@ namespace ConsoleCalculator.Parser {
 			var items = ItemsFor(cfg).ToList();
 			var inputDomain = cfg.symbols;
 			//null Lr0Item represents state of invalid prefix.
-			return new NfaTimelessSpec<Lr0Item, ISymbol, bool>(items, items.First()/*dummy.*/, (startItem, input) => TransitionsFunction(cfg, startItem, input), inputDomain, state => state != null)
-				.DeterministicEquivalent(StartItemsFor(cfg).ToList(), possibleStates => possibleStates.Any(state => state != null));
+			return new NfaTimelessSpec<Lr0Item, ISymbol, bool>(items, items.First()/*dummy.*/, (startItem, input) => TransitionsFunction(cfg, startItem, input), inputDomain, state => true)
+				.DeterministicEquivalent(StartItemsFor(cfg).ToList(), possibleStates => possibleStates.Any());
 		}
 		public delegate IEnumerable<Lexeme> LexDelegate (string input);
 		public delegate TSemanticTreeNode GetLexemeSemanticsDelegate (Lexeme lexeme);
