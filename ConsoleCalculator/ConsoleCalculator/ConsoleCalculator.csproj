@@ -51,16 +51,64 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalculatorLanguage\EvaluationError\DivisionByZeroError.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\EquationIsContradictionError.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\EquationIsTautologyError.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\EvaluationError.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\NoUniqueValueError.cs" />
+    <Compile Include="CalculatorLanguage\Language.Grammar.cs" />
+    <Compile Include="CalculatorLanguage\Language.cs" />
+    <Compile Include="CalculatorLanguage\Language.Lex.cs" />
+    <Compile Include="CalculatorLanguage\Language.Semantics.cs" />
+    <Compile Include="CalculatorLanguage\Language.Tests.cs" />
+    <Compile Include="CalculatorLanguage\LexError\IllegalCharacterError.cs" />
+    <Compile Include="CalculatorLanguage\LexError\IllegalWordError.cs" />
+    <Compile Include="CalculatorLanguage\LexError\LexError.cs" />
+    <Compile Include="CalculatorLanguage\LexError\MalformedNumericLiteralError.cs" />
+    <Compile Include="CalculatorLanguage\LinearEquationInX.Tests.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Base10Logarithm.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Difference.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Division.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Negation.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\NonnegativeLiteral.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Product.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\Sum.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\NonlinearResultError.cs" />
     <Compile Include="ConsoleCalculator.cs" />
     <Compile Include="ConsoleCalculator.Tests.cs" />
-    <Compile Include="LinearInX.cs" />
-    <Compile Include="LinearInX.Tests.cs" />
+    <Compile Include="Parser\Automaton\Dfa.cs" />
+    <Compile Include="Parser\Automaton\Dfa.TimelessSpec.cs" />
+    <Compile Include="Parser\Automaton\NfaTimelessSpec.cs" />
+    <Compile Include="Parser\Language\CfgProduction.cs" />
+    <Compile Include="Parser\Language\LanguageDescriptionException.cs" />
+    <Compile Include="Parser\Lr0Item.cs" />
+    <Compile Include="Parser\Language\Cfg.cs" />
+    <Compile Include="Parser\Language\Nonterminal.cs" />
+    <Compile Include="Parser\Language\Token.cs" />
+    <Compile Include="Parser\Lexeme.cs" />
+    <Compile Include="CalculatorLanguage\LinearInX.cs" />
+    <Compile Include="CalculatorLanguage\LinearInX.Tests.cs" />
+    <Compile Include="CalculatorLanguage\LinearEquationInX.cs" />
+    <Compile Include="CalculatorLanguage\LinearExpressionsInX\LinearExpressionInX.cs" />
+    <Compile Include="Parser\ParseError\ParseError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedContinuedInputError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedEndOfInputError.cs" />
+    <Compile Include="Parser\ParseError\UnexpectedLexemeError.cs" />
+    <Compile Include="Parser\Slr1Parser.cs" />
+    <Compile Include="CalculatorLanguage\SemanticTreeNode.cs" />
+    <Compile Include="Parser\Slr1Parser.Run.cs" />
+    <Compile Include="Parser\Slr1Parser.StackEntry.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Parser\Language\ISymbol.cs" />
+    <Compile Include="UserVisibleError.cs" />
+    <Compile Include="Utilities\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
