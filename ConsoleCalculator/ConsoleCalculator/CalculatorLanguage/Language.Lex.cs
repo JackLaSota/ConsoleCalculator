@@ -63,7 +63,12 @@ namespace ConsoleCalculator.CalculatorLanguage {
 					yield return "" + character;
 				}
 			}
-			yield return string.Join("", accumulatedLetters);
+			var wordThatWasJustFinished2 = string.Join("", accumulatedLetters);//todo remove this repetition.
+			if (wordThatWasJustFinished2 != "")
+				yield return wordThatWasJustFinished2;
+			var numericLiteralThatWasJustFinished2 = string.Join("", accumulatedNumericLiteralParts);
+			if (numericLiteralThatWasJustFinished2 != "") 
+				yield return numericLiteralThatWasJustFinished2;
 		}
 		public static IEnumerable<Lexeme> Lex (IEnumerable<char> input) {
 			var screenedAndChunked = ScreenedForMalformedNumericLiterals(ScreenedForIllegalWords(Chunked(ScreenedForIllegalCharacters(input))));

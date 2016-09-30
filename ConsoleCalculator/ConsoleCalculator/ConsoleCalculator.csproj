@@ -60,6 +60,7 @@
     <Compile Include="CalculatorLanguage\Language.cs" />
     <Compile Include="CalculatorLanguage\Language.Lex.cs" />
     <Compile Include="CalculatorLanguage\Language.Semantics.cs" />
+    <Compile Include="CalculatorLanguage\Language.Tests.cs" />
     <Compile Include="CalculatorLanguage\LexError\IllegalCharacterError.cs" />
     <Compile Include="CalculatorLanguage\LexError\IllegalWordError.cs" />
     <Compile Include="CalculatorLanguage\LexError\LexError.cs" />
