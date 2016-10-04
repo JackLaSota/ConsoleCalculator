@@ -4,5 +4,6 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 		public readonly LinearInX value;
 		public NonnegativeLiteral (LinearInX value) {this.value = value;}
 		public override LinearInX ComputeValue () {return value;}
+		public override string ToString () => "(" + value + ")";
 	}
 }

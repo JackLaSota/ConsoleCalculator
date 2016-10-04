@@ -7,5 +7,6 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 			this.right = right;
 		}
 		public override LinearInX ComputeValue () {return left.ComputeValue() + right.ComputeValue();}
+		public override string ToString () => "(" + left + " + " + right + ")";
 	}
 }

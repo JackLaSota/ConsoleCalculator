@@ -8,7 +8,7 @@ namespace ConsoleCalculator.Parser {
 	/// <summary> Immutable. </summary>
 	public partial class Slr1Parser <TSemanticTreeNode> where TSemanticTreeNode : class {
 		readonly Cfg cfg;
-		readonly Dfa<List<Lr0Item>, ISymbol, bool>.TimelessSpec dfaSpec;
+		readonly Dfa<List<Lr0Item>, Symbol, bool>.TimelessSpec dfaSpec;
 		readonly GetLexemeSemanticsDelegate getLexemeSemantics;
 		readonly GetNonterminalSemanticsDelegate getNonterminalSemantics;
 		readonly LexDelegate lex;
@@ -25,7 +25,7 @@ namespace ConsoleCalculator.Parser {
 		static IEnumerable<Lr0Item> ItemsFor (CfgProduction production) {
 			return Enumerable.Range(0, production.product.Count).Select(index => new Lr0Item(production, index));
 		}
-		static IEnumerable<Lr0Item> TransitionsFunction (Cfg cfg, Lr0Item startItem, ISymbol input) {
+		static IEnumerable<Lr0Item> TransitionsFunction (Cfg cfg, Lr0Item startItem, Symbol input) {
 			return startItem.Continuation.AsSingletonOrEmpty()
 				.Concat(ReachableWithEmptyTokenStringFrom(cfg, startItem).Where(item => item.NextSymbol == input));
 		}
@@ -36,11 +36,11 @@ namespace ConsoleCalculator.Parser {
 			return (startItem.NextSymbol as Nonterminal).AsSingletonOrEmpty()
 				.SelectMany(nonterminal => ItemsFromFreshExpansionOfSymbol(cfg, nonterminal));
 		}
-		public static Dfa<List<Lr0Item>, ISymbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {
+		public static Dfa<List<Lr0Item>, Symbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {
 			var items = ItemsFor(cfg).ToList();
 			var inputDomain = cfg.symbols;
 			//null Lr0Item represents state of invalid prefix.
-			return new NfaTimelessSpec<Lr0Item, ISymbol, bool>(items, items.First()/*dummy.*/, (startItem, input) => TransitionsFunction(cfg, startItem, input), inputDomain, state => true)
+			return new NfaTimelessSpec<Lr0Item, Symbol, bool>(items, items.First()/*dummy.*/, (startItem, input) => TransitionsFunction(cfg, startItem, input), inputDomain, state => true)
 				.DeterministicEquivalent(StartItemsFor(cfg).ToList(), possibleStates => possibleStates.Any());
 		}
 		public delegate IEnumerable<Lexeme> LexDelegate (string input);

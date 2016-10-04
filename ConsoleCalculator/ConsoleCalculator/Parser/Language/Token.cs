@@ -1,4 +1,4 @@
 namespace ConsoleCalculator.Parser.Language {
-	public class Token : ISymbol {
+	public class Token : Symbol {
 	}
 }

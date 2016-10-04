@@ -6,13 +6,13 @@ namespace ConsoleCalculator.Parser {
 	public partial class Slr1Parser <TSemanticTreeNode> {
 		public class StackEntry {
 			/// <summary> Has read in up to and including the things placed alongside it on the stack. </summary>
-			public readonly Dfa<List<Lr0Item>, ISymbol, bool> stackSoFarValidityAsPrefixClassifier;
+			public readonly Dfa<List<Lr0Item>, Symbol, bool> stackSoFarValidityAsPrefixClassifier;
 			public readonly TSemanticTreeNode meaning;
-			public readonly ISymbol symbol;
+			public readonly Symbol symbol;
 			public StackEntry (
-				Dfa<List<Lr0Item>, ISymbol, bool> stackSoFarValidityAsPrefixClassifier,
+				Dfa<List<Lr0Item>, Symbol, bool> stackSoFarValidityAsPrefixClassifier,
 				TSemanticTreeNode meaning,
-				ISymbol symbol
+				Symbol symbol
 			) {
 				this.stackSoFarValidityAsPrefixClassifier = stackSoFarValidityAsPrefixClassifier;
 				this.meaning = meaning;

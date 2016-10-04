@@ -24,7 +24,7 @@ namespace ConsoleCalculator.Parser {
 			}
 			bool CanShift (Lexeme lexeme) {return LastDfa.TransitionedOn(lexeme.token).Output;}
 			StackEntry LastStackEntry => stack[stack.Count - 1];
-			Dfa<List<Lr0Item>, ISymbol, bool> LastDfa => LastStackEntry.stackSoFarValidityAsPrefixClassifier;
+			Dfa<List<Lr0Item>, Symbol, bool> LastDfa => LastStackEntry.stackSoFarValidityAsPrefixClassifier;
 			void ReduceBy (CfgProduction production) {
 				var product = TakeProductFromStack(production);
 				AddReagentToStack(production, product);

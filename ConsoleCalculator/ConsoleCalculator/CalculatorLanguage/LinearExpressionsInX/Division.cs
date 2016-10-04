@@ -15,5 +15,6 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 			if (rightValue.b == 0) throw new DivisionByZeroError();
 			return new LinearInX {a = leftValue.a / rightValue.b, b = leftValue.b / rightValue.b};
 		}
+		public override string ToString () => "(" + left + " - " + right + ")";
 	}
 }

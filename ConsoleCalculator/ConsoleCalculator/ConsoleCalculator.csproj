@@ -90,6 +90,7 @@
     <Compile Include="CalculatorLanguage\LinearInX.Tests.cs" />
     <Compile Include="CalculatorLanguage\LinearEquationInX.cs" />
     <Compile Include="CalculatorLanguage\LinearExpressionsInX\LinearExpressionInX.cs" />
+    <Compile Include="Parser\Lr0Item.Tests.cs" />
     <Compile Include="Parser\ParseError\ParseError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedContinuedInputError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedEndOfInputError.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="Parser\Slr1Parser.StackEntry.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Parser\Language\ISymbol.cs" />
+    <Compile Include="Parser\Language\Symbol.cs" />
     <Compile Include="UserVisibleError.cs" />
     <Compile Include="Utilities\Extensions.cs" />
   </ItemGroup>

@@ -10,5 +10,6 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 			if (argumentValue.a != 0) throw new NonlinearResultError();
 			return new LinearInX {a = 0, b = (float) Math.Log10(argumentValue.b)};
 		}
+		public override string ToString () => "log(" + argument + ")";
 	}
 }

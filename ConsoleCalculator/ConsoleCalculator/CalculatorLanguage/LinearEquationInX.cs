@@ -21,5 +21,6 @@ namespace ConsoleCalculator.CalculatorLanguage {
 			leftValue.b -= leftValue.b; rightValue.b -= leftValue.b;
 			return rightValue.b / leftValue.a;
 		}
+		public override string ToString () => left + "=" + right;
 	}
 }

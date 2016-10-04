@@ -18,5 +18,6 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 				b = leftValue.b * rightValue.b
 			};
 		}
+		public override string ToString () => "(" + left + " * " + right + ")";
 	}
 }

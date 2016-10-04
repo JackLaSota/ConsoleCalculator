@@ -1,4 +1,4 @@
 namespace ConsoleCalculator.Parser.Language {
-	public class Nonterminal : ISymbol {
+	public class Nonterminal : Symbol {
 	}
 }
