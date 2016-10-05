@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace ConsoleCalculator.Parser.Automaton {
-	public partial class Dfa <TState, TInput, TOutput> where TState : class {
+	public partial class Dfa <TState, TInput, TOutput> {
 		/// <summary> Represents the output and state transition diagram of a DFA. </summary>
 		public class TimelessSpec {
 			public readonly List<TState> states;

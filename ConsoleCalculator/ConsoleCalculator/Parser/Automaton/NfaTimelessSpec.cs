@@ -8,7 +8,7 @@ namespace ConsoleCalculator.Parser.Automaton {
 	/// <typeparam name="TState"> State type. State identity is based on reference equality. </typeparam>
 	/// <typeparam name="TInput"> Input type. </typeparam>
 	/// <typeparam name="TOutput"> Output type. </typeparam>
-	public class NfaTimelessSpec <TState, TInput, TOutput> where TState : class {
+	public class NfaTimelessSpec <TState, TInput, TOutput> {
 		public readonly List<TState> states;
 		public readonly Func<TState, TOutput> outputFunction;
 		public readonly List<TInput> inputDomain;
@@ -44,10 +44,11 @@ namespace ConsoleCalculator.Parser.Automaton {
 		) {
 			var setsOfStates = new List<List<TState>>();
 			var getOrMakeStateSet = (Func<List<TState>, List<TState>>) (possibleDuplicateStateSet => {
-				var preexisting = setsOfStates.FirstOrDefault(set => StateSetsEquivalent(set, possibleDuplicateStateSet));
-				if (preexisting == null)
-					setsOfStates.Add(possibleDuplicateStateSet);
-				return preexisting ?? possibleDuplicateStateSet;
+				var equivalent = setsOfStates.Where(set => StateSetsEquivalent(set, possibleDuplicateStateSet));
+				if (equivalent.Any())
+					return equivalent.Single();
+				setsOfStates.Add(possibleDuplicateStateSet);
+				return possibleDuplicateStateSet;
 			});
 			var newTransitionFunction = (Func<List<TState>, TInput, List<TState>>) ((possibleSetOfOldStates, input) =>
 				getOrMakeStateSet(possibleSetOfOldStates.SelectMany(oldState => transitionsFunction(oldState, input)).Distinct().ToList())
