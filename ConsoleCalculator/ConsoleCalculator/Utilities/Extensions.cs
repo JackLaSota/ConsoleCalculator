@@ -94,5 +94,6 @@ namespace ConsoleCalculator.Utilities {
 			toReturn += "}";
 			return toReturn;
 		}
+		[Pure] public static IEnumerable<T> WhereNull <T> (this IEnumerable<T> enumerable) where T : class {return enumerable.Where(t => t == null);}
 	}
 }

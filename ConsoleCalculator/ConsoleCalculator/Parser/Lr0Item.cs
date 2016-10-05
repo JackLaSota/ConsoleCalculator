@@ -7,15 +7,13 @@ namespace ConsoleCalculator.Parser {
 		public readonly CfgProduction cfgProduction;
 		public readonly int nextProductIndex;
 		public Lr0Item (CfgProduction cfgProduction, int nextProductIndex) {
-			if (nextProductIndex < 0 || nextProductIndex >= cfgProduction.product.Count)
+			if (nextProductIndex < 0 || nextProductIndex > cfgProduction.product.Count)
 				throw new ArgumentOutOfRangeException();
 			this.cfgProduction = cfgProduction;
 			this.nextProductIndex = nextProductIndex;
 		}
-		public Symbol NextSymbol => cfgProduction.product[nextProductIndex];
-		public Lr0Item? Continuation =>
-			nextProductIndex + 1 >= cfgProduction.product.Count ? (Lr0Item?) null
-			: new Lr0Item(cfgProduction, nextProductIndex + 1);
+		public Symbol NextSymbol => nextProductIndex >= cfgProduction.product.Count ? null : cfgProduction.product[nextProductIndex];
+		public Lr0Item? Continuation => NextSymbol == null ? (Lr0Item?) null : new Lr0Item(cfgProduction, nextProductIndex + 1);
 		public Lr0Item? ContinuationOn (Symbol input) {
 			if (NextSymbol != input) return null;
 			return Continuation;
@@ -33,6 +31,7 @@ namespace ConsoleCalculator.Parser {
 		}
 		[Pure] public override int GetHashCode () {return 19381 * cfgProduction.GetHashCode() + 73459 * nextProductIndex.GetHashCode();}
 		public bool CanBeCompletedBy (Symbol symbol) {return nextProductIndex == cfgProduction.product.Count && NextSymbol == symbol;}
+		public bool Complete => nextProductIndex == cfgProduction.product.Count;
 		public override string ToString () {
 			var before = cfgProduction.product.GetRange(0, nextProductIndex);
 			var after = cfgProduction.product.GetRange(nextProductIndex, cfgProduction.product.Count - nextProductIndex);

@@ -17,7 +17,8 @@ namespace ConsoleCalculator.Parser.Language {
 			static Symbol[] symbols = {start, aToken, bToken, xNonterminal, yNonterminal};
 			static Cfg cfg = new Cfg(symbols, start, new[] {startToX, xToY, yToYandA, yToBYandA, yToB});
 			[Test] public void SymbolsThatCanDirectlyFollowTest () {
-				CollectionAssert.AreEquivalent(new Symbol [] {}, cfg.SymbolsThatCanDirectlyFollow(xNonterminal));
+				CollectionAssert.AreEquivalent(new Symbol [] {null}, cfg.SymbolsThatCanDirectlyFollow(start));
+				CollectionAssert.AreEquivalent(new Symbol [] {null}, cfg.SymbolsThatCanDirectlyFollow(xNonterminal));
 				CollectionAssert.AreEquivalent(new [] {aToken}, cfg.SymbolsThatCanDirectlyFollow(yNonterminal));
 			}
 			[Test] public void SymbolsThatCanComeFirstInOneExpansionOfTest () {
@@ -37,9 +38,17 @@ namespace ConsoleCalculator.Parser.Language {
 			static CfgProduction xToXAndY = new CfgProduction(xNonterminal, xNonterminal, yNonterminal);
 			static Cfg withRecursingX = new Cfg(symbols, start, new[] {startToX, xToY, xToXAndY, yToYandA, yToBYandA, yToB});
 			[Test] public void TokensThatCanFollowTest () {
-				CollectionAssert.AreEquivalent(new Symbol [] {}, cfg.TokensThatCanFollow(xNonterminal));
+				CollectionAssert.AreEquivalent(new Token [] {null}, cfg.TokensThatCanFollow(xNonterminal));
 				CollectionAssert.AreEquivalent(new [] {aToken}, cfg.TokensThatCanFollow(yNonterminal));
-				CollectionAssert.AreEquivalent(new [] {bToken}, withRecursingX.TokensThatCanFollow(xNonterminal));
+				CollectionAssert.AreEquivalent(new [] {bToken, null}, withRecursingX.TokensThatCanFollow(xNonterminal));
+			}
+			[Test] public void DistinctDoesNotStripNullTest () {
+				CollectionAssert.AreEquivalent(new object[] {null}, new object[] {null}.Distinct());
+				CollectionAssert.AreEquivalent(new Symbol[] {null, aToken}, new Symbol[] {null, aToken}.Distinct());
+			}
+			[Test] public void LinqCastDoesNotStripNullTest () {
+				// ReSharper disable once RedundantEnumerableCastCall
+				CollectionAssert.AreEquivalent(new object[] {null}, new object[] {null}.Cast<object>());
 			}
 		}
 	}

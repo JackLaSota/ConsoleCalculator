@@ -3,6 +3,7 @@ using System.Linq;
 using ConsoleCalculator.Parser.Automaton;
 using ConsoleCalculator.Parser.Language;
 using ConsoleCalculator.Parser.ParseError;
+using JetBrains.Annotations;
 
 namespace ConsoleCalculator.Parser {
 	public partial class Slr1Parser <TSemanticTreeNode> {
@@ -23,9 +24,7 @@ namespace ConsoleCalculator.Parser {
 				));
 			}
 			StackEntry LastStackEntry => stack[stack.Count - 1];
-			StackEntry SecondLastStackEntry => stack[stack.Count - 2];
 			Dfa<List<Lr0Item>, Symbol, bool> LastDfa => LastStackEntry.stackSoFarValidityAsPrefixClassifier;
-			Dfa<List<Lr0Item>, Symbol, bool> SecondLastDfa => SecondLastStackEntry.stackSoFarValidityAsPrefixClassifier;
 			void ReduceBy (CfgProduction production) {
 				var product = TakeProductFromStack(production);
 				AddReagentToStack(production, product);
@@ -43,28 +42,35 @@ namespace ConsoleCalculator.Parser {
 					production.reagent
 				));
 			}
-			bool CanShift => LastDfa.Output;/*
-			CfgProduction ReductionWithHandle => parser.HandlesWithLastOnStack(SecondLastDfa.currentState, LastStackEntry.symbol);*/
-			CfgProduction ReductionToTake (Token lookahead) {
-				return parser.HandlesWithLastOnStack(SecondLastDfa.currentState, LastStackEntry.symbol)
-					.Single(reduction => FollowContainsLookahead(reduction, lookahead));
+			bool CanShift => LastDfa.Output;
+			/// <param name="lookahead">null lookahead indicates end of stream.</param>
+			CfgProduction ReductionToTake ([CanBeNull] Token lookahead) {
+				return parser.Handles(LastDfa.currentState)
+					.SingleOrDefault(reduction => FollowContainsLookahead(reduction, lookahead));
 			}
-			bool FollowContainsLookahead (CfgProduction reduction, Token lookahead) {
+			/// <param name="reduction">production whose reagant's follow shall be checked.</param>
+			/// <param name="lookahead">null lookahead indicates end of stream.</param>
+			bool FollowContainsLookahead (CfgProduction reduction, [CanBeNull] Token lookahead) {
 				return parser.cfg.TokensThatCanFollow(reduction.reagent).Contains(lookahead);
+			}
+			/// <param name="lookahead">null lookahead indicates end of stream.</param>
+			void MakeAllReductionsPossibleWith ([CanBeNull] Token lookahead) {
+				while (ReductionToTake(lookahead) != null)
+					ReduceBy(ReductionToTake(lookahead));
 			}
 			public TSemanticTreeNode Execute () {
 				var inputStream = lexedInput.GetEnumerator();
 				try {
 					while (inputStream.MoveNext()) {
 						var next = inputStream.Current;
-						while (ReductionToTake(next.token) != null)
-							ReduceBy(ReductionToTake(next.token));
+						MakeAllReductionsPossibleWith(next.token);
 						if (CanShift)
 							Shift(next);
 						else
 							throw new UnexpectedLexemeError("Unexpected lexeme: " + next.text);
 					}
-					if (stack.Count != 2)
+					MakeAllReductionsPossibleWith(null);
+					if (stack.Count != 2)//First is the special-case stack entry which holds the start-state of the DFA and no symbols. If succcessful there is a start symbol on the next and only other entry.
 						throw new UnexpectedEndOfInputError("Unexpected end of input.");
 					return stack[1].meaning;
 				}

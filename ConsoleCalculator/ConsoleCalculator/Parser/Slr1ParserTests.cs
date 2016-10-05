@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Language;
+using ConsoleCalculator.Parser.ParserSetupException;
 using NUnit.Framework;
 
 namespace ConsoleCalculator.Parser {
@@ -41,8 +42,11 @@ namespace ConsoleCalculator.Parser {
 			CollectionAssert.AreEquivalent(
 				new[] {
 					new Lr0Item(startToNeedlessDetour, 0),
+					new Lr0Item(startToNeedlessDetour, 1),
 					new Lr0Item(startSymbolToAToken, 0),
-					new Lr0Item(needlessDetourToB, 0)
+					new Lr0Item(startSymbolToAToken, 1),
+					new Lr0Item(needlessDetourToB, 0),
+					new Lr0Item(needlessDetourToB, 1)
 				},
 				Slr1Parser<ExampleSemanticNode>.ItemsFor(slightlyMoreComplicatedGrammar)
 			);
@@ -72,12 +76,17 @@ namespace ConsoleCalculator.Parser {
 		[Test] public void ParseBracketsTransitionFunctionTest () {
 			var nfaSpec = Slr1Parser<ExampleSemanticNode>.NfaSpecFor(nestedBracketsGrammar);
 			CollectionAssert.IsEmpty(nfaSpec.transitionsFunction(new Lr0Item(expressionToBrackets, 0), startSymbol));
-			Assert.AreEqual(expression, Slr1Parser<ExampleSemanticNode>.HandlesWithLastOnStackIn(new List<Lr0Item> {new Lr0Item(startToExpression, 0)}).Single().Item1);
+			Assert.That(new Lr0Item(startToExpression, 1).Complete);
+			Assert.AreEqual(startToExpression, Slr1Parser<ExampleSemanticNode>.HandlesIn(new List<Lr0Item> {new Lr0Item(startToExpression, 1)}).Single());
 			CollectionAssert.AreEquivalent(
 				new [] {
 					new Lr0Item(expressionToBrackets, 1),
 					new Lr0Item(expressionToBracketedExpression, 1)
-				}, nfaSpec.transitionsFunction(new Lr0Item(startToExpression, 0), leftBracketToken));
+				}, nfaSpec.transitionsFunction(new Lr0Item(startToExpression, 0), leftBracketToken)
+			);
+		}
+		[Test] public void ParseBracketsReduceLogicTest () {
+			CollectionAssert.Contains(nestedBracketsGrammar.TokensThatCanFollow(expression), null);
 		}
 		class Bracketed {
 			// ReSharper disable once NotAccessedField.Local
@@ -98,6 +107,18 @@ namespace ConsoleCalculator.Parser {
 			);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			parser.Parse("[]");
+		}
+		static CfgProduction needlessDetourToA = new CfgProduction(needlessDetour, aToken);
+		static Cfg ambiguousGrammar = new Cfg(new Symbol[] {startSymbol, aToken, needlessDetour}, startSymbol, new [] {
+			startToNeedlessDetour, needlessDetourToA, startSymbolToAToken
+		});
+		[Test] public void NonSlr1GrammarTest () {
+			Assert.Throws<NonSlr1GrammarException>(() => new Slr1Parser<ExampleSemanticNode>(
+				ambiguousGrammar,
+				toLex => {throw new Exception("Should never be called.");},
+				lexeme => {throw new Exception("Should never be called.");},
+				(a, b) => {throw new Exception("Should never be called.");}
+			));
 		}
 		//todo test with a producible start symbol.
 		//todo test with a non-slr1 grammar.

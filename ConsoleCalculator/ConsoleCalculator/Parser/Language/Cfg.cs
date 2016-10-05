@@ -44,11 +44,13 @@ namespace ConsoleCalculator.Parser.Language {
 		bool IsReagentOfAnyProduction (Nonterminal nonterminal) => productions.All(production => production.reagent != nonterminal);
 		public IEnumerable<Token> Tokens => symbols.OfType<Token>();
 		public IEnumerable<Nonterminal> Nonterminals => symbols.OfType<Nonterminal>();
+		/// <summary> Includes null if nonterminal can be followed by end of input. </summary>
 		[Pure] public IEnumerable<Token> TokensThatCanFollow (Nonterminal nonterminal) {
 			var followingSymbols = SymbolsThatCanDirectlyFollow(nonterminal).ToList();
-			return SymbolsThatCanDirectlyFollow(nonterminal).OfType<Token>().Concat(
-				followingSymbols.OfType<Nonterminal>().SelectMany(TokensThatCanComeFirstInExpansionOf)
-			).Distinct();
+			return followingSymbols.OfType<Token>()
+				.Concat(followingSymbols.OfType<Nonterminal>().SelectMany(TokensThatCanComeFirstInExpansionOf))
+				.Concat(followingSymbols.WhereNull().Cast<Token>())
+				.Distinct();
 		}
 		[Pure] public IEnumerable<Token> TokensThatCanComeFirstInExpansionOf (Nonterminal nonterminal) {
 			var withIntermediateNonterminals = nonterminal.Closure(
@@ -60,10 +62,15 @@ namespace ConsoleCalculator.Parser.Language {
 			return productions.Where(production => production.reagent == nonterminal && production.product.Count > 0)
 				.Select(production => production.product[0]).Distinct();
 		}
+		/// <summary> Includes null if nonterminal can be followed by end of input. </summary>
 		[Pure] public IEnumerable<Symbol> SymbolsThatCanDirectlyFollow (Symbol symbol) {
-			return productions.SelectMany(production => Enumerable.Range(1, production.product.Count - 1)
-				.Where(followIndex => production.product[followIndex - 1] == symbol)
-				.Select(followIndex => production.product[followIndex])).Distinct();
+			var answerIfNotStartSymbol = productions.SelectMany(production => {
+				var productWithNullAtEndIfAllowed = production.reagent == startSymbol ? production.product.Then(null).ToList() : production.product;
+				return Enumerable.Range(1, productWithNullAtEndIfAllowed.Count - 1)
+					.Where(followIndex => productWithNullAtEndIfAllowed[followIndex - 1] == symbol)
+					.Select(followIndex => productWithNullAtEndIfAllowed[followIndex]);
+			}).Distinct();
+			return symbol == startSymbol ? answerIfNotStartSymbol.Then(null) : answerIfNotStartSymbol;
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Automaton;
@@ -26,7 +25,7 @@ namespace ConsoleCalculator.Parser {
 		}
 		[Pure] public static Lr0Item FirstItemFor (CfgProduction production) {return new Lr0Item(production, 0);}
 		[Pure] public static IEnumerable<Lr0Item> ItemsFor (CfgProduction production) {
-			return Enumerable.Range(0, production.product.Count).Select(index => new Lr0Item(production, index));
+			return Enumerable.Range(0, production.product.Count + 1).Select(index => new Lr0Item(production, index));
 		}
 		[Pure] public static IEnumerable<Lr0Item> TransitionsFunction (Cfg cfg, Lr0Item startItem, Symbol input) {
 			return startItem.AsSingleton().SelectMany(item => item.ContinuationOn(input).AsNonNullableSingletonOrEmpty())
@@ -39,15 +38,15 @@ namespace ConsoleCalculator.Parser {
 			return (startItem.NextSymbol as Nonterminal).AsSingletonOrEmpty()
 				.SelectMany(nonterminal => ItemsFromFreshExpansionOfSymbol(cfg, nonterminal));
 		}
-		[Pure] public static NfaTimelessSpec<Lr0Item, Symbol, bool> NfaSpecFor (Cfg cfg) {
+		[Pure] public static NfaTimelessSpec<Lr0Item, Symbol, string> NfaSpecFor (Cfg cfg) {
 			var items = ItemsFor(cfg).ToList();
 			var inputDomain = cfg.symbols;
-			return new NfaTimelessSpec<Lr0Item, Symbol, bool>(
+			return new NfaTimelessSpec<Lr0Item, Symbol, string>(
 				items,
 				items.First()/*dummy.*/,
 				(startItem, input) => TransitionsFunction(cfg, startItem, input),
 				inputDomain,
-				state => true
+				state => "dummy"
 			);
 		}
 		[Pure] public static Dfa<List<Lr0Item>, Symbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {
@@ -57,19 +56,13 @@ namespace ConsoleCalculator.Parser {
 				possibleStates => possibleStates.Any()
 			);
 		}
-		Dictionary<Tuple<List<Lr0Item>, Symbol>, List<CfgProduction>> handlesWithLastOnStack
-			= new Dictionary<Tuple<List<Lr0Item>, Symbol>, List<CfgProduction>>();
-		[Pure] public List<CfgProduction> HandlesWithLastOnStack (List<Lr0Item> state, Symbol lastOnStack) {
-			var key = new Tuple<List<Lr0Item>, Symbol>(state, lastOnStack);
-			if (!handlesWithLastOnStack.ContainsKey(key))
-				return new List<CfgProduction>();
-			return handlesWithLastOnStack[key];
-		}
+		Dictionary<List<Lr0Item>, List<CfgProduction>> handles = new Dictionary<List<Lr0Item>, List<CfgProduction>>();
+		[Pure] public List<CfgProduction> Handles (List<Lr0Item> state) {return handles[state];}
 		[Pure] public bool CanShift (List<Lr0Item> dfaState, Token symbol) {
 			return dfaSpec.outputFunction(dfaSpec.transitionFunction(dfaState, symbol));
 		}
-		[Pure] public static IEnumerable<Tuple<Symbol, CfgProduction>> HandlesWithLastOnStackIn (List<Lr0Item> dfaState) {
-			return dfaState.Where(item => item.Continuation == null).Select(item => new Tuple<Symbol, CfgProduction>(item.NextSymbol, item.cfgProduction));
+		[Pure] public static IEnumerable<CfgProduction> HandlesIn (List<Lr0Item> dfaState) {
+			return dfaState.Where(item => item.Complete).Select(item => item.cfgProduction);
 		}
 		public delegate IEnumerable<Lexeme> LexDelegate (string input);
 		public delegate TSemanticTreeNode GetLexemeSemanticsDelegate (Lexeme lexeme);
@@ -81,20 +74,18 @@ namespace ConsoleCalculator.Parser {
 			this.lex = lex;
 			dfaSpec = DfaSpecFor(cfg);
 			foreach (var state in dfaSpec.states) {
-				var handlesByLastOnStack = HandlesWithLastOnStackIn(state).ToList();
+				var handlesInState = HandlesIn(state).ToList();
 				foreach (var lastOnStack in this.cfg.symbols) {
 					var token = lastOnStack as Token;
 					var canShift = token != null && CanShift(state, token);
-					var handlesWithLastOnStack = handlesByLastOnStack.Where(pair => pair.Item1 == lastOnStack).ToList();
-					if (canShift && handlesWithLastOnStack.Any())
-						throw new NonSlr1GrammarException("Shift-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ".");
-					var nonterminalsThisCouldReduceTo = handlesWithLastOnStack.Select(handle => handle.Item2.reagent);
-					foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>())
-						if (nonterminalsThisCouldReduceTo.Count(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)) > 1)
+					foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>()) {
+						var usableHandles = handlesInState.Select(handle => handle.reagent).Where(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)).ToList();
+						if (canShift && usableHandles.Any())
+							throw new NonSlr1GrammarException("Shift-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ".");
+						if (usableHandles.Count > 1)
 							throw new NonSlr1GrammarException("Reduce-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ", with input: " + possibleLookahead + ".");
-					this.handlesWithLastOnStack[new Tuple<List<Lr0Item>, Symbol>(state, lastOnStack)] =
-						handlesByLastOnStack.Where(handleWithRequiredLastOnStack => handleWithRequiredLastOnStack.Item1 == lastOnStack)
-						.Select(handleWithRequiredLastOnStack => handleWithRequiredLastOnStack.Item2).ToList();
+					}
+					handles[state] = handlesInState;
 				}
 			}
 		}
