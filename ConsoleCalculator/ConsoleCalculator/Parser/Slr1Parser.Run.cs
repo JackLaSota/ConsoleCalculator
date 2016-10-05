@@ -22,9 +22,10 @@ namespace ConsoleCalculator.Parser {
 					lexeme.token
 				));
 			}
-			bool CanShift (Lexeme lexeme) {return LastDfa.TransitionedOn(lexeme.token).Output;}
 			StackEntry LastStackEntry => stack[stack.Count - 1];
+			StackEntry SecondLastStackEntry => stack[stack.Count - 2];
 			Dfa<List<Lr0Item>, Symbol, bool> LastDfa => LastStackEntry.stackSoFarValidityAsPrefixClassifier;
+			Dfa<List<Lr0Item>, Symbol, bool> SecondLastDfa => SecondLastStackEntry.stackSoFarValidityAsPrefixClassifier;
 			void ReduceBy (CfgProduction production) {
 				var product = TakeProductFromStack(production);
 				AddReagentToStack(production, product);
@@ -42,24 +43,23 @@ namespace ConsoleCalculator.Parser {
 					production.reagent
 				));
 			}
+			bool CanShift => LastDfa.Output;
+			CfgProduction AvailableReduction => parser.CompletionFrom(SecondLastDfa.currentState, LastStackEntry.symbol);
 			public TSemanticTreeNode Execute () {
 				var inputStream = lexedInput.GetEnumerator();
 				try {
 					while (inputStream.MoveNext()) {
 						var next = inputStream.Current;
-						var completableItem = LastDfa.currentState.SingleOrDefault(item => item.CanBeCompletedBy(next.token));
-						if (completableItem != null) {
-							stack.Add(new StackEntry(null /*dummy*/, parser.getLexemeSemantics(next), next.token));
-							ReduceBy(completableItem.cfgProduction);
-						}
-						else if (CanShift(next))
+						if (CanShift)
 							Shift(next);
 						else
 							throw new UnexpectedLexemeError("Unexpected lexeme: " + next.text);
+						while (AvailableReduction != null)
+							ReduceBy(AvailableReduction);
 					}
-					if (stack.Count != 1)
+					if (stack.Count != 2)
 						throw new UnexpectedEndOfInputError("Unexpected end of input.");
-					return stack[0].meaning;
+					return stack[1].meaning;
 				}
 				finally {inputStream.Dispose();}
 			}

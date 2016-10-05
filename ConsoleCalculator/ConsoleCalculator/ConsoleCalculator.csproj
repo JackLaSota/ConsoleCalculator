@@ -96,10 +96,13 @@
     <Compile Include="Parser\ParseError\UnexpectedContinuedInputError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedEndOfInputError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedLexemeError.cs" />
+    <Compile Include="Parser\ParserSetupException\NonSlr1GrammarException.cs" />
+    <Compile Include="Parser\ParserSetupException\ParserSetupException.cs" />
     <Compile Include="Parser\Slr1Parser.cs" />
     <Compile Include="CalculatorLanguage\SemanticTreeNode.cs" />
     <Compile Include="Parser\Slr1Parser.Run.cs" />
     <Compile Include="Parser\Slr1Parser.StackEntry.cs" />
+    <Compile Include="Parser\Slr1ParserTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parser\Language\Symbol.cs" />

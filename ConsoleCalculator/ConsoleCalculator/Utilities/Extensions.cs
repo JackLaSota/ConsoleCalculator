@@ -11,6 +11,7 @@ namespace ConsoleCalculator.Utilities {
 		}
 		[Pure] public static IEnumerable<T> AsSingleton <T> (this T t) {yield return t;}
 		[Pure] public static IEnumerable<T> AsSingletonOrEmpty <T> (this T t) {if (t != null) yield return t;}
+		[Pure] public static IEnumerable<T> AsNonNullableSingletonOrEmpty <T> (this T? t) where T : struct {if (t != null) yield return t.Value;}
 		[Pure] public static IEnumerable<T> Closure <T> (//Adapted from: http://stackoverflow.com/a/10253591
 			this T start,
 			Func<T, IEnumerable<T>> reachableFrom,
@@ -44,6 +45,42 @@ namespace ConsoleCalculator.Utilities {
 			foreach (var t in enumerable)
 				hashset.Add(t);
 			return hashset;
+		}
+		[Pure] public static bool ContainsAll <T> (this IEnumerable<T> container, IEnumerable<T> possibleSubset) {
+			var possibleSubsetAsHashSet = possibleSubset.ToHashSet();
+			var seenSoFarInBoth = new HashSet<T>();
+			// ReSharper disable once LoopCanBeConvertedToQuery
+			foreach (var t in container) {
+				if (possibleSubsetAsHashSet.Contains(t))
+					if (seenSoFarInBoth.Add(t))
+						if (seenSoFarInBoth.Count == possibleSubsetAsHashSet.Count)
+							return true;
+			}
+			return possibleSubsetAsHashSet.Count == 0;
+		}
+		[Pure] public static IEnumerable<T> Then <T> (this IEnumerable<T> enumerable, T extra) {
+			return enumerable.Concat(extra.AsSingleton());
+		}
+		[Pure] public static bool AllDistinct <T> (this IEnumerable<T> enumerable) {
+			var hashSet = new HashSet<T>();
+			return enumerable.All(t => hashSet.Add(t));
+		}
+		[Pure] public static IEnumerable<T> Except<T> (this IEnumerable<T> enumerable, T exception) {
+			return enumerable.Where(t => !t.Equals(exception));
+		}
+		[Pure] public static string ToStringAllowingNull (this object o) {return o == null ? "null" : o.ToString();}
+		[Pure] public static string BeforeLast (this string original, string substring) {
+			var lastIndexOf = original.LastIndexOf(substring, StringComparison.Ordinal);
+			return lastIndexOf == -1 ? original : original.Substring(0, lastIndexOf);
+		}
+		[Pure] public static string ToDetailedString<T> (this IEnumerable<T> enumerable) {
+			var toReturn = "{";
+			foreach (var t in enumerable)
+				toReturn += t.ToStringAllowingNull() + ", ";
+			if (enumerable.Count() != 0)
+				toReturn = toReturn.BeforeLast(", ");
+			toReturn += "}";
+			return toReturn;
 		}
 	}
 }

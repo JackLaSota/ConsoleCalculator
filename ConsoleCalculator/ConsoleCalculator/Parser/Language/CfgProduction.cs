@@ -13,6 +13,6 @@ namespace ConsoleCalculator.Parser.Language {
 			this.reagent = reagent;
 			this.product = product.ToList();
 		}
-		public override string ToString () => reagent + " = " + string.Join(", ", product) + ";";
+		public override string ToString () => reagent + " -> " + string.Join("", product) + "";
 	}
 }
