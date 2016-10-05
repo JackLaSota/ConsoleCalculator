@@ -18,9 +18,9 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		};
 		static bool IsLegalCharacter (char character) {return legalCharacters.Contains(character);}
 		static bool IsLegalWord (string word) {return word == "log" || word == "x";}
-		static bool IsLegalNumericLiteral (string literal) {return literal.Count(c => c == '.') <= 1 && literal.All(IsNumericLiteralPart);}
+		static bool IsLegalNumericLiteral (string literal) {return literal != "" && literal.Count(c => c == '.') <= 1 && literal.All(IsNumberPart);}
 		/// <summary> Important note: unary "-" is an operator and not part of a numeric literal in this language. </summary>
-		static bool IsNumericLiteralPart (char character) {return char.IsDigit(character) || character == '.';}
+		static bool IsNumberPart (char character) {return char.IsDigit(character) || character == '.';}
 		static IEnumerable<string> ScreenedForIllegalWords (IEnumerable<string> chunkedInput) {
 			foreach (var wordOrNonAlphabetic in chunkedInput) {
 				if (char.IsLetter(wordOrNonAlphabetic[0]) && !IsLegalWord(wordOrNonAlphabetic))
@@ -37,38 +37,38 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		}
 		static IEnumerable<string> ScreenedForMalformedNumericLiterals (IEnumerable<string> chunkedInput) {
 			foreach (var possibleNumericLiteral in chunkedInput) {
-				if (IsNumericLiteralPart(possibleNumericLiteral[0]) && !IsLegalNumericLiteral(possibleNumericLiteral))
+				if (IsNumberPart(possibleNumericLiteral[0]) && !IsLegalNumericLiteral(possibleNumericLiteral))
 					throw new MalformedNumericLiteralError("Malformed numeric literal: " + possibleNumericLiteral);
 				yield return possibleNumericLiteral;
 			}
 		}
 		/// <summary> This will group together all contiguous characters that need to be in the same lexeme. </summary>
 		static IEnumerable<string> Chunked (IEnumerable<char> input) {
-			var accumulatedLetters = new List<char>();
-			var accumulatedNumericLiteralParts = new List<char>();
+			var accumulated = new List<char>();
+			var takeAccumulatedChunk = (Func<string>) (() => {
+				var chunk = string.Join("", accumulated);
+				accumulated.Clear();
+				return chunk == "" ? null : chunk;
+			});
 			foreach (var character in input) {
-				if (char.IsLetter(character))
-					accumulatedLetters.Add(character);
-				else if (IsNumericLiteralPart(character))
-					accumulatedNumericLiteralParts.Add(character);
-				else {
-					var wordThatWasJustFinished = string.Join("", accumulatedLetters);
-					if (wordThatWasJustFinished != "")
-						yield return wordThatWasJustFinished;
-					accumulatedLetters.Clear();
-					var numericLiteralThatWasJustFinished = string.Join("", accumulatedNumericLiteralParts);
-					if (numericLiteralThatWasJustFinished != "") 
-						yield return numericLiteralThatWasJustFinished;
-					accumulatedNumericLiteralParts.Clear();
-					yield return "" + character;
+				var isLetter = char.IsLetter(character);
+				var isNumberPart = IsNumberPart(character);
+				var isGroupable = isLetter || isNumberPart;
+				var canExtend = isGroupable && accumulated.Count != 0
+					&& (isLetter && char.IsLetter(accumulated[0]) || isNumberPart && IsNumberPart(accumulated[0]));
+				if (!canExtend) {
+					var justFinishedChunk = takeAccumulatedChunk();
+					if (justFinishedChunk != null)
+						yield return justFinishedChunk;
+					if (!isGroupable)
+						yield return "" + character;
 				}
+				if (isGroupable)
+					accumulated.Add(character);
 			}
-			var wordThatWasJustFinished2 = string.Join("", accumulatedLetters);//todo remove this repetition.
-			if (wordThatWasJustFinished2 != "")
-				yield return wordThatWasJustFinished2;
-			var numericLiteralThatWasJustFinished2 = string.Join("", accumulatedNumericLiteralParts);
-			if (numericLiteralThatWasJustFinished2 != "") 
-				yield return numericLiteralThatWasJustFinished2;
+			var lastChunk = takeAccumulatedChunk();
+			if (lastChunk != null)
+				yield return lastChunk;
 		}
 		public static IEnumerable<Lexeme> Lex (IEnumerable<char> input) {
 			var screenedAndChunked = ScreenedForMalformedNumericLiterals(ScreenedForIllegalWords(Chunked(ScreenedForIllegalCharacters(input))));
