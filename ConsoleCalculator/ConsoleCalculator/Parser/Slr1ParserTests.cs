@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Language;
-using ConsoleCalculator.Utilities;
 using NUnit.Framework;
 
 namespace ConsoleCalculator.Parser {
@@ -73,23 +72,12 @@ namespace ConsoleCalculator.Parser {
 		[Test] public void ParseBracketsTransitionFunctionTest () {
 			var nfaSpec = Slr1Parser<ExampleSemanticNode>.NfaSpecFor(nestedBracketsGrammar);
 			CollectionAssert.IsEmpty(nfaSpec.transitionsFunction(new Lr0Item(expressionToBrackets, 0), startSymbol));
-			Assert.AreEqual(expression, Slr1Parser<ExampleSemanticNode>.CompletionsFrom(new List<Lr0Item> {new Lr0Item(startToExpression, 0)}).Single().Item1);
+			Assert.AreEqual(expression, Slr1Parser<ExampleSemanticNode>.HandlesWithLastOnStackIn(new List<Lr0Item> {new Lr0Item(startToExpression, 0)}).Single().Item1);
 			CollectionAssert.AreEquivalent(
 				new [] {
 					new Lr0Item(expressionToBrackets, 1),
 					new Lr0Item(expressionToBracketedExpression, 1)
 				}, nfaSpec.transitionsFunction(new Lr0Item(startToExpression, 0), leftBracketToken));
-		}
-		[Test] public void ParseBracketsCanShiftTest () {
-			var nfaSpec = Slr1Parser<ExampleSemanticNode>.NfaSpecFor(nestedBracketsGrammar);
-			foreach (var state in nfaSpec.states) {
-				foreach (var input in nfaSpec.inputDomain)
-				Console.WriteLine(state + " transitioned on " + input + " goes to " + nfaSpec.transitionsFunction(state, input).ToDetailedString());
-			}
-			var dfaSpec = Slr1Parser<ExampleSemanticNode>.DfaSpecFor(nestedBracketsGrammar);
-			foreach (var state in dfaSpec.states) {
-				Console.WriteLine(state.ToDetailedString());
-			}
 		}
 		class Bracketed {
 			// ReSharper disable once NotAccessedField.Local

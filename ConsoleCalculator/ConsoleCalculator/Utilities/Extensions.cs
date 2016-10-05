@@ -19,6 +19,18 @@ namespace ConsoleCalculator.Utilities {
 		) {
 			return ClosureFromMultiple(start.AsSingleton(), reachableFrom, excludeStartUnlessReachedAgain);
 		}
+		[Pure] public static HashSet<T> FixedPointUnder <T> (this IEnumerable<T> startSet, Func<HashSet<T>, HashSet<T>> step) {
+			var current = startSet.ToHashSet();
+			HashSet<T> previousStep;
+			do {
+				previousStep = current;
+				current = step(current);
+			} while (!current.HasSameContentAs(previousStep));
+			return current;
+		}
+		[Pure] public static bool HasSameContentAs <T> (this HashSet<T> left, HashSet<T> right) {
+			return left.Count == right.Count && left.IsSubsetOf(right);
+		}
 		[Pure] public static IEnumerable<T> ClosureFromMultiple <T> (
 			this IEnumerable<T> start,
 			Func<T, IEnumerable<T>> reachableFrom,

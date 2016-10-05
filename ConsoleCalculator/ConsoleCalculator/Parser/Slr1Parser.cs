@@ -57,17 +57,18 @@ namespace ConsoleCalculator.Parser {
 				possibleStates => possibleStates.Any()
 			);
 		}
-		Dictionary<Tuple<List<Lr0Item>, Symbol>, CfgProduction> completions = new Dictionary<Tuple<List<Lr0Item>, Symbol>, CfgProduction>();
-		[Pure] public CfgProduction CompletionFrom (List<Lr0Item> state, Symbol next) {
-			var key = new Tuple<List<Lr0Item>, Symbol>(state, next);
-			if (!completions.ContainsKey(key))
-				return null;
-			return completions[key];
+		Dictionary<Tuple<List<Lr0Item>, Symbol>, List<CfgProduction>> handlesWithLastOnStack
+			= new Dictionary<Tuple<List<Lr0Item>, Symbol>, List<CfgProduction>>();
+		[Pure] public List<CfgProduction> HandlesWithLastOnStack (List<Lr0Item> state, Symbol lastOnStack) {
+			var key = new Tuple<List<Lr0Item>, Symbol>(state, lastOnStack);
+			if (!handlesWithLastOnStack.ContainsKey(key))
+				return new List<CfgProduction>();
+			return handlesWithLastOnStack[key];
 		}
 		[Pure] public bool CanShift (List<Lr0Item> dfaState, Token symbol) {
 			return dfaSpec.outputFunction(dfaSpec.transitionFunction(dfaState, symbol));
 		}
-		[Pure] public static IEnumerable<Tuple<Symbol, CfgProduction>> CompletionsFrom (List<Lr0Item> dfaState) {
+		[Pure] public static IEnumerable<Tuple<Symbol, CfgProduction>> HandlesWithLastOnStackIn (List<Lr0Item> dfaState) {
 			return dfaState.Where(item => item.Continuation == null).Select(item => new Tuple<Symbol, CfgProduction>(item.NextSymbol, item.cfgProduction));
 		}
 		public delegate IEnumerable<Lexeme> LexDelegate (string input);
@@ -80,17 +81,20 @@ namespace ConsoleCalculator.Parser {
 			this.lex = lex;
 			dfaSpec = DfaSpecFor(cfg);
 			foreach (var state in dfaSpec.states) {
-				var completionsFromStateBySymbol = CompletionsFrom(state).ToList();
-				foreach (var input in this.cfg.symbols) {
-					var token = input as Token;
+				var handlesByLastOnStack = HandlesWithLastOnStackIn(state).ToList();
+				foreach (var lastOnStack in this.cfg.symbols) {
+					var token = lastOnStack as Token;
 					var canShift = token != null && CanShift(state, token);
-					var completionsOnThisInput = completionsFromStateBySymbol.Where(pair => pair.Item1 == input).ToList();
-					if (canShift && completionsOnThisInput.Any())
-						throw new NonSlr1GrammarException("Shift-reduce conflict on input: " + input + ", in state: " + state.ToDetailedString());
-					if (completionsOnThisInput.Count > 1)
-						throw new NonSlr1GrammarException("Reduce-reduce conflict on input: " + input + ", in state: " + state.ToDetailedString());
-					foreach (var completion in completionsOnThisInput)
-						completions[new Tuple<List<Lr0Item>, Symbol>(state, completion.Item1)] = completion.Item2;
+					var handlesWithLastOnStack = handlesByLastOnStack.Where(pair => pair.Item1 == lastOnStack).ToList();
+					if (canShift && handlesWithLastOnStack.Any())
+						throw new NonSlr1GrammarException("Shift-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ".");
+					var nonterminalsThisCouldReduceTo = handlesWithLastOnStack.Select(handle => handle.Item2.reagent);
+					foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>())
+						if (nonterminalsThisCouldReduceTo.Count(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)) > 1)
+							throw new NonSlr1GrammarException("Reduce-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ", with input: " + possibleLookahead + ".");
+					this.handlesWithLastOnStack[new Tuple<List<Lr0Item>, Symbol>(state, lastOnStack)] =
+						handlesByLastOnStack.Where(handleWithRequiredLastOnStack => handleWithRequiredLastOnStack.Item1 == lastOnStack)
+						.Select(handleWithRequiredLastOnStack => handleWithRequiredLastOnStack.Item2).ToList();
 				}
 			}
 		}

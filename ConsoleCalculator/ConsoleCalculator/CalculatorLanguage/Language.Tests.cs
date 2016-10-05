@@ -1,5 +1,9 @@
+using System;
 using System.Linq;
 using ConsoleCalculator.CalculatorLanguage.LexError;
+using ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX;
+using ConsoleCalculator.Parser;
+using ConsoleCalculator.Utilities;
 using NUnit.Framework;
 
 namespace ConsoleCalculator.CalculatorLanguage {
@@ -64,6 +68,31 @@ namespace ConsoleCalculator.CalculatorLanguage {
 					new [] {"log", "(", "1.1", "x", ")"},
 					Lex("log(1.1x)").Select(lexeme => lexeme.text)
 				);
+			}
+			Slr1Parser<SemanticTreeNode> parser = CreateParser();
+			[Test] public void ParseOneTest () {
+				var one = parser.Parse("1");
+				Assert.IsInstanceOf<LinearExpressionInX>(one);
+				Assert.AreEqual(new LinearInX {a = 0, b = 1}, ((LinearExpressionInX) one).ComputeValue());
+			}
+			[Test] public void ParseOnePlusOneTest () {
+				var onePlusOne = parser.Parse("1+1");
+				Assert.IsInstanceOf<LinearExpressionInX>(onePlusOne);
+				Assert.AreEqual(new LinearInX {a = 0, b = 2}, ((LinearExpressionInX) onePlusOne).ComputeValue());
+			}
+			[Test] public void OutputTransitions () {
+				var nfaSpec = Slr1Parser<SemanticTreeNode>.NfaSpecFor(grammar);
+				foreach (var state in nfaSpec.states) {
+					foreach (var input in nfaSpec.inputDomain) {
+						var transitionResult = nfaSpec.transitionsFunction(state, input);
+						//if (transitionResult.Any())
+							Console.WriteLine(state + " transitioned on " + input + " goes to " + transitionResult.ToDetailedString());
+					}
+				}
+				var dfaSpec = Slr1Parser<SemanticTreeNode>.DfaSpecFor(grammar);
+				foreach (var state in dfaSpec.states) {
+					Console.WriteLine(state.ToDetailedString());
+				}	
 			}
 		}
 	}

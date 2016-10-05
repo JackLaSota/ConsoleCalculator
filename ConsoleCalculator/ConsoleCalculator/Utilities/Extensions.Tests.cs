@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -24,6 +25,12 @@ namespace ConsoleCalculator.Utilities {
 				Assert.That(new int[] {}.AllDistinct());
 				Assert.That(new [] {1, 2, 3}.AllDistinct());
 				Assert.That(!new [] {1, 1}.AllDistinct());
+			}
+			[Test] public void FixedPointUnderTest () {
+				CollectionAssert.AreEquivalent(new [] {1}, new [] {1, 2, 3, 4}.FixedPointUnder(
+					a => a.Count == 1 ? a : a.Except(a.Max()).ToHashSet()));
+				CollectionAssert.AreEquivalent(new int[] {}, new int[] {}.FixedPointUnder(a => a));
+				CollectionAssert.AreEquivalent(new int[] {}, new [] {1}.FixedPointUnder(a => new HashSet<int>()));
 			}
 		}
 	}

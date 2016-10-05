@@ -14,12 +14,10 @@ namespace ConsoleCalculator {
 				if (input.Contains("exit")) return;
 				try {
 					var parsedInput = parser.Parse(input);
-					var expression = parsedInput as LinearExpressionInX; if (expression != null) {
+					var expression = parsedInput as LinearExpressionInX; if (expression != null)
 						Console.WriteLine(expression.ComputeValue());
-					}
-					var equation = parsedInput as LinearEquationInX; if (equation != null) {
+					var equation = parsedInput as LinearEquationInX; if (equation != null)
 						Console.WriteLine("x = " + equation.ComputeUniquelyDeterminedX());
-					}
 				}
 				catch (UserVisibleError error) {
 					Console.WriteLine(error.GetType().Name + ": " + error.Message);

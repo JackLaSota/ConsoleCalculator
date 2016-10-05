@@ -80,6 +80,7 @@
     <Compile Include="Parser\Automaton\Dfa.TimelessSpec.cs" />
     <Compile Include="Parser\Automaton\NfaTimelessSpecTests.cs" />
     <Compile Include="Parser\Automaton\NfaTimelessSpec.cs" />
+    <Compile Include="Parser\Language\Cfg.Tests.cs" />
     <Compile Include="Parser\Language\CfgProduction.cs" />
     <Compile Include="Parser\Language\LanguageDescriptionException.cs" />
     <Compile Include="Parser\Lr0Item.cs" />

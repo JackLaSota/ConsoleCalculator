@@ -43,19 +43,26 @@ namespace ConsoleCalculator.Parser {
 					production.reagent
 				));
 			}
-			bool CanShift => LastDfa.Output;
-			CfgProduction AvailableReduction => parser.CompletionFrom(SecondLastDfa.currentState, LastStackEntry.symbol);
+			bool CanShift => LastDfa.Output;/*
+			CfgProduction ReductionWithHandle => parser.HandlesWithLastOnStack(SecondLastDfa.currentState, LastStackEntry.symbol);*/
+			CfgProduction ReductionToTake (Token lookahead) {
+				return parser.HandlesWithLastOnStack(SecondLastDfa.currentState, LastStackEntry.symbol)
+					.Single(reduction => FollowContainsLookahead(reduction, lookahead));
+			}
+			bool FollowContainsLookahead (CfgProduction reduction, Token lookahead) {
+				return parser.cfg.TokensThatCanFollow(reduction.reagent).Contains(lookahead);
+			}
 			public TSemanticTreeNode Execute () {
 				var inputStream = lexedInput.GetEnumerator();
 				try {
 					while (inputStream.MoveNext()) {
 						var next = inputStream.Current;
+						while (ReductionToTake(next.token) != null)
+							ReduceBy(ReductionToTake(next.token));
 						if (CanShift)
 							Shift(next);
 						else
 							throw new UnexpectedLexemeError("Unexpected lexeme: " + next.text);
-						while (AvailableReduction != null)
-							ReduceBy(AvailableReduction);
 					}
 					if (stack.Count != 2)
 						throw new UnexpectedEndOfInputError("Unexpected end of input.");
