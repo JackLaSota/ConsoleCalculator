@@ -39,7 +39,7 @@ namespace ConsoleCalculator.Parser.Language {
 			static Cfg withRecursingX = new Cfg(symbols, start, new[] {startToX, xToY, xToXAndY, yToYandA, yToBYandA, yToB});
 			[Test] public void TokensThatCanFollowTest () {
 				CollectionAssert.AreEquivalent(new Token [] {null}, cfg.TokensThatCanFollow(xNonterminal));
-				CollectionAssert.AreEquivalent(new [] {aToken}, cfg.TokensThatCanFollow(yNonterminal));
+				CollectionAssert.AreEquivalent(new [] {aToken, null}, cfg.TokensThatCanFollow(yNonterminal));
 				CollectionAssert.AreEquivalent(new [] {bToken, null}, withRecursingX.TokensThatCanFollow(xNonterminal));
 			}
 			[Test] public void DistinctDoesNotStripNullTest () {

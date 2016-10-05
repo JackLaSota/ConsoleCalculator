@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ConsoleCalculator.Parser;
 using ConsoleCalculator.CalculatorLanguage;
 using ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX;
@@ -11,6 +12,8 @@ namespace ConsoleCalculator {
 			while (true) {
 				var input = Console.ReadLine();
 				if (input == null) continue;
+				if (input == "") continue;
+				if (input.All(c => c == ' ')) continue;
 				if (input.Contains("exit")) return;
 				try {
 					var parsedInput = parser.Parse(input);

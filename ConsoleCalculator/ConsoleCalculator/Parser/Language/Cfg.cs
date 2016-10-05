@@ -46,11 +46,18 @@ namespace ConsoleCalculator.Parser.Language {
 		public IEnumerable<Nonterminal> Nonterminals => symbols.OfType<Nonterminal>();
 		/// <summary> Includes null if nonterminal can be followed by end of input. </summary>
 		[Pure] public IEnumerable<Token> TokensThatCanFollow (Nonterminal nonterminal) {
-			var followingSymbols = SymbolsThatCanDirectlyFollow(nonterminal).ToList();
+			var nonterminalsItCouldBe = nonterminal.Closure(NonterminalsThatCanExpandToEndWith);
+			var followingSymbols = nonterminalsItCouldBe.SelectMany(SymbolsThatCanDirectlyFollow).ToList();
 			return followingSymbols.OfType<Token>()
 				.Concat(followingSymbols.OfType<Nonterminal>().SelectMany(TokensThatCanComeFirstInExpansionOf))
 				.Concat(followingSymbols.WhereNull().Cast<Token>())
 				.Distinct();
+		}
+		[Pure] public IEnumerable<CfgProduction> ProductionsFrom (Nonterminal nonterminal) {
+			return productions.Where(production => production.reagent == nonterminal);
+		}
+		[Pure] public IEnumerable<Nonterminal> NonterminalsThatCanExpandToEndWith ([NotNull] Symbol symbol) {
+			return Nonterminals.Where(nonterminal => ProductionsFrom(nonterminal).Any(production => production.product.Last() == symbol));
 		}
 		[Pure] public IEnumerable<Token> TokensThatCanComeFirstInExpansionOf (Nonterminal nonterminal) {
 			var withIntermediateNonterminals = nonterminal.Closure(

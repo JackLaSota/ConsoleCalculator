@@ -8,6 +8,7 @@ namespace ConsoleCalculator.CalculatorLanguage.LinearExpressionsInX {
 		public override LinearInX ComputeValue () {
 			var argumentValue = argument.ComputeValue();
 			if (argumentValue.a != 0) throw new NonlinearResultError();
+			if (argumentValue.b <= 0) throw new LogOfNonpositiveError();
 			return new LinearInX {a = 0, b = (float) Math.Log10(argumentValue.b)};
 		}
 		public override string ToString () => "log(" + argument + ")";

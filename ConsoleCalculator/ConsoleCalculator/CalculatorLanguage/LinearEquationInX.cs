@@ -18,7 +18,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 				throw new EquationIsContradictionError();
 			}
 			leftValue.a -= rightValue.a; rightValue.a -= rightValue.a;
-			leftValue.b -= leftValue.b; rightValue.b -= leftValue.b;
+			rightValue.b -= leftValue.b; leftValue.b -= leftValue.b;
 			return rightValue.b / leftValue.a;
 		}
 		public override string ToString () => left + "=" + right;

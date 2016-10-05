@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ConsoleCalculator.Utilities;
 using JetBrains.Annotations;
 
 namespace ConsoleCalculator.CalculatorLanguage {
@@ -8,7 +12,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		/// <summary> Constant offset. </summary>
 		public float b;
 		[Pure] public static explicit operator string (LinearInX toCast) {
-			return "(" + toCast.a + "x + " + toCast.b + ")";
+			return SimplifiedLinearCombinationExpression(new[] {toCast.a, toCast.b}, new [] {"x", ""});
 		}
 		[Pure] public override string ToString () {return (string) this;}
 		[Pure] public static bool operator == (LinearInX left, LinearInX right) {
@@ -31,5 +35,21 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		[Pure] public static LinearInX operator * (float left, LinearInX right) {return right * left;}
 		[Pure] public static LinearInX operator - (LinearInX toNegate) {return -1 * toNegate;}
 		[Pure] public static LinearInX operator + (LinearInX toReturn) {return toReturn;}
+		///<summary>
+		///	Preconditions:
+		///		Coefficients has the same length as variableNames.
+		///		All variable names unique.
+		///</summary>
+		public static string SimplifiedLinearCombinationExpression (IEnumerable<float> coefficients, IEnumerable<string> variableNames) {
+			var coefficientsArray = coefficients.ToArray();
+			return coefficientsArray.All(c => c == 0) ? "0" :
+				string.Join(
+					" + ",
+					coefficients.ZipPairs(variableNames)
+						.Where(pair => pair.first != 0)
+						.Select(pair => Math.Abs(pair.first) == 1 && pair.second != "" ? (pair.first < 0 ? "-" : "") + pair.second : pair.first + pair.second)
+						.ToArray()
+				).Replace("+ -", "- ");
+		}
 	}
 }

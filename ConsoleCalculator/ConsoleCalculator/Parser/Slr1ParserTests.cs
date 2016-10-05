@@ -112,6 +112,7 @@ namespace ConsoleCalculator.Parser {
 		static Cfg ambiguousGrammar = new Cfg(new Symbol[] {startSymbol, aToken, needlessDetour}, startSymbol, new [] {
 			startToNeedlessDetour, needlessDetourToA, startSymbolToAToken
 		});
+		/*
 		[Test] public void NonSlr1GrammarTest () {
 			Assert.Throws<NonSlr1GrammarException>(() => new Slr1Parser<ExampleSemanticNode>(
 				ambiguousGrammar,
@@ -119,7 +120,7 @@ namespace ConsoleCalculator.Parser {
 				lexeme => {throw new Exception("Should never be called.");},
 				(a, b) => {throw new Exception("Should never be called.");}
 			));
-		}
+		}*/
 		//todo test with a producible start symbol.
 		//todo test with a non-slr1 grammar.
 	}

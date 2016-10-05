@@ -75,18 +75,15 @@ namespace ConsoleCalculator.Parser {
 			dfaSpec = DfaSpecFor(cfg);
 			foreach (var state in dfaSpec.states) {
 				var handlesInState = HandlesIn(state).ToList();
-				foreach (var lastOnStack in this.cfg.symbols) {
-					var token = lastOnStack as Token;
-					var canShift = token != null && CanShift(state, token);
-					foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>()) {
-						var usableHandles = handlesInState.Select(handle => handle.reagent).Where(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)).ToList();
-						if (canShift && usableHandles.Any())
-							throw new NonSlr1GrammarException("Shift-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ".");
-						if (usableHandles.Count > 1)
-							throw new NonSlr1GrammarException("Reduce-reduce conflict on last on stack: " + lastOnStack + ", following state: " + state.ToDetailedString() + ", with input: " + possibleLookahead + ".");
-					}
-					handles[state] = handlesInState;
+				foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>()) {
+					var canShift = possibleLookahead != null && CanShift(state, possibleLookahead);
+					var usableHandles = handlesInState.Select(handle => handle.reagent).Where(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)).ToList();
+					if (canShift && usableHandles.Any())
+						throw new NonSlr1GrammarException("Shift-reduce conflict in state: " + state.ToDetailedString() + ", with input: " + possibleLookahead + ".");
+					if (usableHandles.Count > 1)
+						throw new NonSlr1GrammarException("Reduce-reduce conflict in state: " + state.ToDetailedString() + ", with input: " + possibleLookahead + ".");
 				}
+				handles[state] = handlesInState;
 			}
 		}
 		[Pure] public TSemanticTreeNode Parse (string input) {return new Run(this, lex(input)).Execute();}

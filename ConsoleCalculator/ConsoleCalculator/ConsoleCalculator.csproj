@@ -55,6 +55,7 @@
     <Compile Include="CalculatorLanguage\EvaluationError\EquationIsContradictionError.cs" />
     <Compile Include="CalculatorLanguage\EvaluationError\EquationIsTautologyError.cs" />
     <Compile Include="CalculatorLanguage\EvaluationError\EvaluationError.cs" />
+    <Compile Include="CalculatorLanguage\EvaluationError\LogOfNonpositiveError.cs" />
     <Compile Include="CalculatorLanguage\EvaluationError\NoUniqueValueError.cs" />
     <Compile Include="CalculatorLanguage\Language.Grammar.cs" />
     <Compile Include="CalculatorLanguage\Language.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="UserVisibleError.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\Extensions.Tests.cs" />
+    <Compile Include="Utilities\Pair.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

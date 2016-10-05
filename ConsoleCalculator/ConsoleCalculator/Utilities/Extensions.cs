@@ -95,5 +95,12 @@ namespace ConsoleCalculator.Utilities {
 			return toReturn;
 		}
 		[Pure] public static IEnumerable<T> WhereNull <T> (this IEnumerable<T> enumerable) where T : class {return enumerable.Where(t => t == null);}
+		[Pure] public static IEnumerable<Pair<T, S>> ZipPairs <T, S> (this IEnumerable<T> left, IEnumerable<S> right) {
+			return ZipStructPairs(left, right).Select(pair => pair.AsClassPair);
+		}
+		[Pure] public static IEnumerable<StructPair<T, S>> ZipStructPairs <T, S> (this IEnumerable<T> left, IEnumerable<S> right) {
+			var leftEnumerator = left.GetEnumerator(); var rightEnumerator = right.GetEnumerator();
+			while (leftEnumerator.MoveNext() && rightEnumerator.MoveNext()) yield return new StructPair<T, S>(leftEnumerator.Current, rightEnumerator.Current);
+		}
 	}
 }
