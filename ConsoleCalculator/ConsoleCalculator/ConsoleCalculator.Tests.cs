@@ -17,6 +17,7 @@ namespace ConsoleCalculator {
 			[TestCase("3 / 4 / 4", ExpectedResult = "0.1875")]
 			[TestCase("3 / 4 * 4", ExpectedResult = "3")]
 			[TestCase("3 - 4 - 4", ExpectedResult = "-5")]
+			[TestCase("1 + 2 3", ExpectedResult = "7")]
 			[TestCase("1 +1", ExpectedResult = "2")]
 			[TestCase(" 1", ExpectedResult = "1")]
 			[TestCase("(1)", ExpectedResult = "1")]
