@@ -75,7 +75,7 @@ namespace ConsoleCalculator.Parser {
 			dfaSpec = DfaSpecFor(cfg);
 			foreach (var state in dfaSpec.states) {
 				var handlesInState = HandlesIn(state).ToList();
-				foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>()) {
+				foreach (var possibleLookahead in this.cfg.symbols.OfType<Token>().Then(null)) {
 					var canShift = possibleLookahead != null && CanShift(state, possibleLookahead);
 					var usableHandles = handlesInState.Select(handle => handle.reagent).Where(nonterminal => cfg.TokensThatCanFollow(nonterminal).Contains(possibleLookahead)).ToList();
 					if (canShift && usableHandles.Any())

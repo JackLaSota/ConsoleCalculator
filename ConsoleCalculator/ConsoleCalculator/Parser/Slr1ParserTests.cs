@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Language;
+using ConsoleCalculator.Parser.ParserSetupException;
 using NUnit.Framework;
 
 namespace ConsoleCalculator.Parser {
@@ -107,6 +108,18 @@ namespace ConsoleCalculator.Parser {
 			);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			parser.Parse("[]");
+		}
+		static CfgProduction needlessDetourToA = new CfgProduction(needlessDetour, aToken);
+		static Cfg ambiguousGrammar = new Cfg(new Symbol[] {startSymbol, aToken, needlessDetour}, startSymbol, new [] {
+			startToNeedlessDetour, needlessDetourToA, startSymbolToAToken
+		});
+		[Test] public void NonSlr1GrammarTest () {
+			Assert.Throws<NonSlr1GrammarException>(() => new Slr1Parser<ExampleSemanticNode>(
+				ambiguousGrammar,
+				toLex => {throw new Exception("Should never be called.");},//ncrunch: no coverage
+				lexeme => {throw new Exception("Should never be called.");},//ncrunch: no coverage
+				(a, b) => {throw new Exception("Should never be called.");}//ncrunch: no coverage
+			));
 		}
 	}
 }
