@@ -72,6 +72,8 @@ namespace ConsoleCalculator.Parser {
 					MakeAllReductionsPossibleWith(null);
 					if (stack.Count != 2)//First is the special-case stack entry which holds the start-state of the DFA and no symbols. If succcessful there is a start symbol on the next and only other entry.
 						throw new UnexpectedEndOfInputError("Unexpected end of input.");
+					if (stack[1].symbol != parser.cfg.startSymbol)
+						throw new UnexpectedEndOfInputError("Unexpected end of input.");
 					return stack[1].meaning;
 				}
 				finally {inputStream.Dispose();}
