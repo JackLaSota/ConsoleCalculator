@@ -101,6 +101,7 @@ namespace ConsoleCalculator.Utilities {
 		[Pure] public static IEnumerable<StructPair<T, S>> ZipStructPairs <T, S> (this IEnumerable<T> left, IEnumerable<S> right) {
 			var leftEnumerator = left.GetEnumerator(); var rightEnumerator = right.GetEnumerator();
 			while (leftEnumerator.MoveNext() && rightEnumerator.MoveNext()) yield return new StructPair<T, S>(leftEnumerator.Current, rightEnumerator.Current);
+			leftEnumerator.Dispose(); rightEnumerator.Dispose();
 		}
 	}
 }

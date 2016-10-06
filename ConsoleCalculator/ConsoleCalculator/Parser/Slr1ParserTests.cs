@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleCalculator.Parser.Language;
-using ConsoleCalculator.Parser.ParserSetupException;
 using NUnit.Framework;
 
 namespace ConsoleCalculator.Parser {
@@ -11,6 +10,7 @@ namespace ConsoleCalculator.Parser {
 		static Token aToken = new Token {name = "a"};
 		static CfgProduction startSymbolToAToken = new CfgProduction(startSymbol, aToken);
 		static Cfg mostTrivialGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {startSymbolToAToken});
+		// ReSharper disable once ClassNeverInstantiated.Local
 		class ExampleSemanticNode {}
 		[Test] public void FirstItemTest () {
 			Assert.AreEqual(
@@ -108,20 +108,5 @@ namespace ConsoleCalculator.Parser {
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			parser.Parse("[]");
 		}
-		static CfgProduction needlessDetourToA = new CfgProduction(needlessDetour, aToken);
-		static Cfg ambiguousGrammar = new Cfg(new Symbol[] {startSymbol, aToken, needlessDetour}, startSymbol, new [] {
-			startToNeedlessDetour, needlessDetourToA, startSymbolToAToken
-		});
-		/*
-		[Test] public void NonSlr1GrammarTest () {
-			Assert.Throws<NonSlr1GrammarException>(() => new Slr1Parser<ExampleSemanticNode>(
-				ambiguousGrammar,
-				toLex => {throw new Exception("Should never be called.");},
-				lexeme => {throw new Exception("Should never be called.");},
-				(a, b) => {throw new Exception("Should never be called.");}
-			));
-		}*/
-		//todo test with a producible start symbol.
-		//todo test with a non-slr1 grammar.
 	}
 }
