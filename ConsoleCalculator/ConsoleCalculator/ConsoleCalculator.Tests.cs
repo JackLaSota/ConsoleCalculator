@@ -7,12 +7,21 @@ namespace ConsoleCalculator {
 				new ConsoleCalculator();
 			}
 			ConsoleCalculator calculator = new ConsoleCalculator();
+			[TestCase("(3+(4-1))*5", ExpectedResult = "30")]
+			[TestCase("2 * x + 0.5 = 1", ExpectedResult = "x = 0.25")]
+			[TestCase("2x + 1 = 2(1-x)", ExpectedResult = "x = 0.25")]
 			[TestCase("x", ExpectedResult = "x")]
 			[TestCase("2(1+x)", ExpectedResult = "2x + 2")]
 			[TestCase("1", ExpectedResult = "1")]
 			[TestCase("1+1", ExpectedResult = "2")]
 			[TestCase("1-1", ExpectedResult = "0")]
 			[TestCase("3 * 4", ExpectedResult = "12")]
+			[TestCase("1 / -1", ExpectedResult = "-1")]
+			[TestCase("1 * -1", ExpectedResult = "-1")]
+			[TestCase("1 - -1", ExpectedResult = "2")]
+			[TestCase("1 - -(1)", ExpectedResult = "2")]
+			[TestCase("1 - (-1)", ExpectedResult = "2")]
+			[TestCase("1 + -1", ExpectedResult = "0")]
 			[TestCase("3 / 4", ExpectedResult = "0.75")]
 			[TestCase("3 / 4 / 4", ExpectedResult = "0.1875")]
 			[TestCase("3 / 4 * 4", ExpectedResult = "3")]
