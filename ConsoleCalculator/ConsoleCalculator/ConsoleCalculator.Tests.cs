@@ -21,6 +21,7 @@ namespace ConsoleCalculator {
 			[TestCase("1 - -1", ExpectedResult = "2")]
 			[TestCase("1 * (5)", ExpectedResult = "5")]
 			[TestCase("1 * (-1)", ExpectedResult = "-1")]
+			[TestCase("1 / -(-1)", ExpectedResult = "1")]
 			[TestCase("1 * -(1)", ExpectedResult = "-1")]
 			[TestCase("1 - -(1)", ExpectedResult = "2")]
 			[TestCase("1 - (-1)", ExpectedResult = "2")]
