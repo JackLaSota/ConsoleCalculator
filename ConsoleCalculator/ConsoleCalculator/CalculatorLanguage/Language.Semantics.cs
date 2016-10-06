@@ -55,7 +55,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 			if (production == termToLog)
 				return new Base10Logarithm((LinearExpressionInX) productSemantics[2]);
 			if (production == foregoParenthesizedExpressionNegation)
-				return productSemantics[0];
+				return productSemantics[1];
 			if (production == negateParenthesizedExpression)
 				return new Negation((LinearExpressionInX) productSemantics[1]);
 			if (production == foregoTermNegation)

@@ -6,6 +6,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		public class MeaninglessAloneToken : SemanticTreeNode {
 			public readonly Token token;
 			public MeaninglessAloneToken (Token token) {this.token = token;}
+			public override string ToString () {return "Meaningless Alone Token: " + token;}
 		}
 	}
 }

@@ -113,7 +113,6 @@
     <Compile Include="CalculatorLanguage\LinearExpressionsInX\LinearExpressionInX.cs" />
     <Compile Include="Parser\Lr0Item.Tests.cs" />
     <Compile Include="Parser\ParseError\ParseError.cs" />
-    <Compile Include="Parser\ParseError\UnexpectedContinuedInputError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedEndOfInputError.cs" />
     <Compile Include="Parser\ParseError\UnexpectedLexemeError.cs" />
     <Compile Include="Parser\ParserSetupException\NonSlr1GrammarException.cs" />
