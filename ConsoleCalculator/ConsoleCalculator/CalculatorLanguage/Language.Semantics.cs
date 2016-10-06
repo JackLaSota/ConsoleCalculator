@@ -5,7 +5,7 @@ using ConsoleCalculator.Parser.Language;
 
 namespace ConsoleCalculator.CalculatorLanguage {
 	public partial class Language {
-		public static SemanticTreeNode LexemeSemantics (Lexeme lexeme) {//todo test that this covers all included tokens.
+		public static SemanticTreeNode LexemeSemantics (Lexeme lexeme) {
 			var token = lexeme.token;
 			if (token == equalsToken) return new SemanticTreeNode.MeaninglessAloneToken(token);
 			if (token == plusToken) return new SemanticTreeNode.MeaninglessAloneToken(token);
@@ -23,7 +23,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 			return new LinearInX {a = 0, b = float.Parse(text)};
 		}
 		/// <summary> Precondition: expansion is valid to generate those productSemantics. This does not check that. </summary>
-		public static SemanticTreeNode NonterminalSemantics (CfgProduction production, List<SemanticTreeNode> productSemantics) {//todo test that this covers all included tokens.
+		public static SemanticTreeNode NonterminalSemantics (CfgProduction production, List<SemanticTreeNode> productSemantics) {
 			if (production == startToEquation)
 				return productSemantics[0];
 			if (production == startToExpression)
