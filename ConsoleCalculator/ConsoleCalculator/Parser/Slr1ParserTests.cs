@@ -11,8 +11,9 @@ namespace ConsoleCalculator.Parser {
 		static Token aToken = new Token {name = "a"};
 		static CfgProduction startSymbolToAToken = new CfgProduction(startSymbol, aToken);
 		static Cfg mostTrivialGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {startSymbolToAToken});
-		// ReSharper disable once ClassNeverInstantiated.Local
-		class ExampleSemanticNode {}
+		class ExampleSemanticNode {
+			public List<ExampleSemanticNode> children = new List<ExampleSemanticNode>();
+		}
 		[Test] public void FirstItemTest () {
 			Assert.AreEqual(
 				new Lr0Item(startSymbolToAToken, 0),
@@ -120,6 +121,23 @@ namespace ConsoleCalculator.Parser {
 				lexeme => {throw new Exception("Should never be called.");},//ncrunch: no coverage
 				(a, b) => {throw new Exception("Should never be called.");}//ncrunch: no coverage
 			));
+		}
+		static CfgProduction startSymbolToStartSymbolAndA = new CfgProduction(startSymbol, startSymbol, aToken);
+		static CfgProduction startSymbolToA = new CfgProduction(startSymbol, aToken);
+		static Cfg startSymbolProducingGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {
+			startSymbolToStartSymbolAndA, startSymbolToA
+		});
+		[Test] public void StartSymbolProducingGrammarTest () {
+			var parser = new Slr1Parser<ExampleSemanticNode>(
+				startSymbolProducingGrammar,
+				toLex => toLex.Select(c => new Lexeme(aToken, "" + c)),
+				lexeme => new ExampleSemanticNode(),
+				(reduction, productSemantics) => new ExampleSemanticNode {children = productSemantics}//ncrunch: no coverage
+			);
+			var parsed = parser.Parse("aaa");
+			CollectionAssert.IsEmpty(parsed.children[1].children);
+			CollectionAssert.IsEmpty(parsed.children[0].children[1].children);
+			CollectionAssert.IsEmpty(parsed.children[0].children[0].children[0].children);
 		}
 	}
 }
