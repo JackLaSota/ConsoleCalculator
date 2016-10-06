@@ -30,7 +30,6 @@ namespace ConsoleCalculator.Parser {
 			return this == (Lr0Item) o;
 		}
 		[Pure] public override int GetHashCode () {return 19381 * cfgProduction.GetHashCode() + 73459 * nextProductIndex.GetHashCode();}
-		public bool CanBeCompletedBy (Symbol symbol) {return nextProductIndex == cfgProduction.product.Count && NextSymbol == symbol;}
 		public bool Complete => nextProductIndex == cfgProduction.product.Count;
 		public override string ToString () {
 			var before = cfgProduction.product.GetRange(0, nextProductIndex);

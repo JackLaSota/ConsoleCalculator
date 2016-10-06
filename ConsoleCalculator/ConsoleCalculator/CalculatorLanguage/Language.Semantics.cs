@@ -16,7 +16,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 			if (token == rightParenthesisToken) return new SemanticTreeNode.MeaninglessAloneToken(token);
 			if (token == logToken) return new SemanticTreeNode.MeaninglessAloneToken(token);
 			if (token == literalToken) return new NonnegativeLiteral(ParseLiteral(lexeme.text));
-			throw new LanguageDescriptionException("ParseLexeme method is incomplete. It does not handle lexeme: " + lexeme + ".");
+			throw new LanguageDescriptionException("ParseLexeme method is incomplete. It does not handle lexeme: " + lexeme + ".");//ncrunch: no coverage
 		}
 		static LinearInX ParseLiteral (string text) {
 			if (text == "x") return new LinearInX {a = 1, b = 0};
@@ -66,7 +66,7 @@ namespace ConsoleCalculator.CalculatorLanguage {
 				return productSemantics[0];
 			if (production == negateLiteral)
 				return new Negation((LinearExpressionInX) productSemantics[1]);
-			throw new LanguageDescriptionException("ParseLexeme method is incomplete. It does not handle production: " + production + ".");
+			throw new LanguageDescriptionException("ParseLexeme method is incomplete. It does not handle production: " + production + ".");//ncrunch: no coverage
 		}
 	}
 }

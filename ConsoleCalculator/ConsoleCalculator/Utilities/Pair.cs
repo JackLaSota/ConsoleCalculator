@@ -9,7 +9,8 @@ namespace ConsoleCalculator.Utilities {
 			this.second = second;
 		}
 		public override string ToString () {return "{" + first.ToStringAllowingNull() + ", " + second.ToStringAllowingNull() + "}";}
-		public StructPair<T, U> AsStructPair {get {return new StructPair<T, U>(first, second);}}
+		// ReSharper disable once UnusedMember.Global
+		public StructPair<T, U> AsStructPair => new StructPair<T, U>(first, second);
 	}
 	public struct StructPair <T, U> {
 		// ReSharper disable once FieldCanBeMadeReadOnly.Global
@@ -26,6 +27,6 @@ namespace ConsoleCalculator.Utilities {
 		public static bool operator != (StructPair<T, U> left, StructPair<T, U> right) {return !(left == right);}
 		public override bool Equals (object o) {return o is StructPair<T, U> && this == (StructPair<T, U>) o;}
 		public override int GetHashCode () {return 19381 * first.GetHashCode() + 73459 * second.GetHashCode();}
-		public Pair<T, U> AsClassPair {get {return new Pair<T, U>(first, second);}}
+		public Pair<T, U> AsClassPair => new Pair<T, U>(first, second);
 	}
 }

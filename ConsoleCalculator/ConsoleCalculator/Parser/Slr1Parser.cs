@@ -46,7 +46,7 @@ namespace ConsoleCalculator.Parser {
 				items.First()/*dummy.*/,
 				(startItem, input) => TransitionsFunction(cfg, startItem, input),
 				inputDomain,
-				state => "dummy"
+				state => "dummy"//ncrunch: no coverage
 			);
 		}
 		[Pure] public static Dfa<List<Lr0Item>, Symbol, bool>.TimelessSpec DfaSpecFor (Cfg cfg) {

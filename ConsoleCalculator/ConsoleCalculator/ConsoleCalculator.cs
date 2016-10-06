@@ -25,11 +25,11 @@ namespace ConsoleCalculator {
 					return expression.ComputeValue().ToString();
 				var equation = parsedInput as LinearEquationInX; if (equation != null)
 					return "x = " + equation.ComputeUniquelyDeterminedX();
+				throw new SystemException("Should not be reachable.");//ncrunch: no coverage
 			}
 			catch (UserVisibleError error) {
 				return error.GetType().Name + ": " + error.Message;
 			}
-			throw new SystemException("Should not be reachable.");
 		}
 		readonly Slr1Parser<SemanticTreeNode> parser;
 		public ConsoleCalculator () {

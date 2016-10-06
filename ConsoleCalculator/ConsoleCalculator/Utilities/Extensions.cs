@@ -80,7 +80,7 @@ namespace ConsoleCalculator.Utilities {
 		[Pure] public static IEnumerable<T> Except<T> (this IEnumerable<T> enumerable, T exception) {
 			return enumerable.Where(t => !t.Equals(exception));
 		}
-		[Pure] public static string ToStringAllowingNull (this object o) {return o == null ? "null" : o.ToString();}
+		[Pure] public static string ToStringAllowingNull (this object o) {return o?.ToString() ?? "null";}
 		[Pure] public static string BeforeLast (this string original, string substring) {
 			var lastIndexOf = original.LastIndexOf(substring, StringComparison.Ordinal);
 			return lastIndexOf == -1 ? original : original.Substring(0, lastIndexOf);
