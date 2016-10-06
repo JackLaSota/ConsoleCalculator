@@ -24,8 +24,8 @@ namespace ConsoleCalculator.CalculatorLanguage {
 		[IncludedInGrammar] public static readonly CfgProduction startToEquation = new CfgProduction(startSymbol, equationSymbol);
 		[IncludedInGrammar] public static readonly CfgProduction startToExpression = new CfgProduction(startSymbol, expressionSymbol);
 		[IncludedInGrammar] public static readonly CfgProduction expandEquation = new CfgProduction(equationSymbol, expressionSymbol, equalsToken, expressionSymbol);
-		[IncludedInGrammar] public static readonly CfgProduction expressionToSum = new CfgProduction(expressionSymbol, negatableTermSymbol, plusToken, expressionSymbol);
-		[IncludedInGrammar] public static readonly CfgProduction expressionToDifference = new CfgProduction(expressionSymbol, negatableTermSymbol, minusToken, expressionSymbol);
+		[IncludedInGrammar] public static readonly CfgProduction expressionToSum = new CfgProduction(expressionSymbol, expressionSymbol, plusToken, negatableTermSymbol);
+		[IncludedInGrammar] public static readonly CfgProduction expressionToDifference = new CfgProduction(expressionSymbol, expressionSymbol, minusToken, negatableTermSymbol);
 		[IncludedInGrammar] public static readonly CfgProduction expressionToNegatableTerm = new CfgProduction(expressionSymbol, negatableTermSymbol);
 		[IncludedInGrammar] public static readonly CfgProduction termToParenthesizedExpression = new CfgProduction(termSymbol, leftParenthesisToken, expressionSymbol, rightParenthesisToken);
 		[IncludedInGrammar] public static readonly CfgProduction termToLiteral = new CfgProduction(termSymbol, literalToken);

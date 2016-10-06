@@ -15,17 +15,21 @@ namespace ConsoleCalculator {
 				if (input == "") continue;
 				if (input.All(c => c == ' ')) continue;
 				if (input.Contains("exit")) return;
-				try {
-					var parsedInput = parser.Parse(input);
-					var expression = parsedInput as LinearExpressionInX; if (expression != null)
-						Console.WriteLine(expression.ComputeValue());
-					var equation = parsedInput as LinearEquationInX; if (equation != null)
-						Console.WriteLine("x = " + equation.ComputeUniquelyDeterminedX());
-				}
-				catch (UserVisibleError error) {
-					Console.WriteLine(error.GetType().Name + ": " + error.Message);
-				}
+				Console.WriteLine(Evaluate(input));
 			}
+		}
+		string Evaluate (string input) {
+			try {
+				var parsedInput = parser.Parse(input);
+				var expression = parsedInput as LinearExpressionInX; if (expression != null)
+					return expression.ComputeValue().ToString();
+				var equation = parsedInput as LinearEquationInX; if (equation != null)
+					return "x = " + equation.ComputeUniquelyDeterminedX();
+			}
+			catch (UserVisibleError error) {
+				return error.GetType().Name + ": " + error.Message;
+			}
+			throw new SystemException("Should not be reachable.");
 		}
 		readonly Slr1Parser<SemanticTreeNode> parser;
 		public ConsoleCalculator () {
