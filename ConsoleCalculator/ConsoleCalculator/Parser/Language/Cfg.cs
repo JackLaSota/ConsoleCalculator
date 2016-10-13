@@ -57,7 +57,7 @@ namespace ConsoleCalculator.Parser.Language {
 			return productions.Where(production => production.reagent == nonterminal);
 		}
 		[Pure] public IEnumerable<Nonterminal> NonterminalsThatCanExpandToEndWith ([NotNull] Symbol symbol) {
-			return Nonterminals.Where(nonterminal => ProductionsFrom(nonterminal).Any(production => production.product.Last() == symbol));
+			return Nonterminals.Where(nonterminal => ProductionsFrom(nonterminal).Any(production => production.product.LastOrDefault() == symbol));
 		}
 		[Pure] public IEnumerable<Token> TokensThatCanComeFirstInExpansionOf (Nonterminal nonterminal) {
 			var withIntermediateNonterminals = nonterminal.Closure(

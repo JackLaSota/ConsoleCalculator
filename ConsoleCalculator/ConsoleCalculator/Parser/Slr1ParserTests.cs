@@ -9,26 +9,26 @@ namespace ConsoleCalculator.Parser {
 	[TestFixture] public class Slr1ParserTests {
 		static Nonterminal startSymbol = new Nonterminal {name = "S"};
 		static Token aToken = new Token {name = "a"};
-		static CfgProduction startSymbolToAToken = new CfgProduction(startSymbol, aToken);
-		static Cfg mostTrivialGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {startSymbolToAToken});
+		static CfgProduction startSymbolToA = new CfgProduction(startSymbol, aToken);
+		static Cfg mostTrivialGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {startSymbolToA});
 		class ExampleSemanticNode {
 			public List<ExampleSemanticNode> children = new List<ExampleSemanticNode>();
 		}
 		[Test] public void FirstItemTest () {
 			Assert.AreEqual(
-				new Lr0Item(startSymbolToAToken, 0),
-				Slr1Parser<ExampleSemanticNode>.FirstItemFor(startSymbolToAToken)
+				new Lr0Item(startSymbolToA, 0),
+				Slr1Parser<ExampleSemanticNode>.FirstItemFor(startSymbolToA)
 			);
 		}
 		[Test] public void StartItemsForTest () {
 			CollectionAssert.AreEquivalent(
-				new [] {new Lr0Item(startSymbolToAToken, 0)},
+				new [] {new Lr0Item(startSymbolToA, 0)},
 				Slr1Parser<ExampleSemanticNode>.StartItemsFor(mostTrivialGrammar)
 			);
 			CollectionAssert.AreEquivalent(
 				new[] {
 					new Lr0Item(startToNeedlessDetour, 0),
-					new Lr0Item(startSymbolToAToken, 0)
+					new Lr0Item(startSymbolToA, 0)
 				},
 				Slr1Parser<ExampleSemanticNode>.StartItemsFor(slightlyMoreComplicatedGrammar)
 			);
@@ -38,15 +38,15 @@ namespace ConsoleCalculator.Parser {
 		static Token bToken = new Token {name = "b"};
 		static CfgProduction needlessDetourToB = new CfgProduction(needlessDetour, bToken);
 		static Cfg slightlyMoreComplicatedGrammar = new Cfg(new Symbol [] {startSymbol, aToken, bToken, needlessDetour}, startSymbol, new [] {
-			startToNeedlessDetour, needlessDetourToB, startSymbolToAToken
+			startToNeedlessDetour, needlessDetourToB, startSymbolToA
 		});
 		[Test] public void ItemsForTest () {
 			CollectionAssert.AreEquivalent(
 				new[] {
 					new Lr0Item(startToNeedlessDetour, 0),
 					new Lr0Item(startToNeedlessDetour, 1),
-					new Lr0Item(startSymbolToAToken, 0),
-					new Lr0Item(startSymbolToAToken, 1),
+					new Lr0Item(startSymbolToA, 0),
+					new Lr0Item(startSymbolToA, 1),
 					new Lr0Item(needlessDetourToB, 0),
 					new Lr0Item(needlessDetourToB, 1)
 				},
@@ -112,7 +112,7 @@ namespace ConsoleCalculator.Parser {
 		}
 		static CfgProduction needlessDetourToA = new CfgProduction(needlessDetour, aToken);
 		static Cfg ambiguousGrammar = new Cfg(new Symbol[] {startSymbol, aToken, needlessDetour}, startSymbol, new [] {
-			startToNeedlessDetour, needlessDetourToA, startSymbolToAToken
+			startToNeedlessDetour, needlessDetourToA, startSymbolToA
 		});
 		[Test] public void NonSlr1GrammarTest () {
 			Assert.Throws<NonSlr1GrammarException>(() => new Slr1Parser<ExampleSemanticNode>(
@@ -123,7 +123,6 @@ namespace ConsoleCalculator.Parser {
 			));
 		}
 		static CfgProduction startSymbolToStartSymbolAndA = new CfgProduction(startSymbol, startSymbol, aToken);
-		static CfgProduction startSymbolToA = new CfgProduction(startSymbol, aToken);
 		static Cfg startSymbolProducingGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new [] {
 			startSymbolToStartSymbolAndA, startSymbolToA
 		});
@@ -132,12 +131,40 @@ namespace ConsoleCalculator.Parser {
 				startSymbolProducingGrammar,
 				toLex => toLex.Select(c => new Lexeme(aToken, "" + c)),
 				lexeme => new ExampleSemanticNode(),
-				(reduction, productSemantics) => new ExampleSemanticNode {children = productSemantics}//ncrunch: no coverage
+				(reduction, productSemantics) => new ExampleSemanticNode {children = productSemantics}
 			);
 			var parsed = parser.Parse("aaa");
 			CollectionAssert.IsEmpty(parsed.children[1].children);
 			CollectionAssert.IsEmpty(parsed.children[0].children[1].children);
 			CollectionAssert.IsEmpty(parsed.children[0].children[0].children[0].children);
+		}
+		static CfgProduction startSymbolToNothing = new CfgProduction(startSymbol);
+		static Cfg emptyStringGrammar = new Cfg(new Symbol[] {startSymbol}, startSymbol, new[] {startSymbolToNothing});
+		[Test] public void EmptyProductGrammarTest () {
+			var parser = new Slr1Parser<ExampleSemanticNode>(
+				emptyStringGrammar,
+				toLex => toLex.Select(c => new Lexeme(aToken, "" + c)),
+				lexeme => new ExampleSemanticNode(),
+				(reduction, productSemantics) => new ExampleSemanticNode {children = productSemantics}
+			);
+			var parsed = parser.Parse("");
+			CollectionAssert.IsEmpty(parsed.children);
+		}
+		static Cfg startSymbolProducingAndEmptyStringGrammar = new Cfg(new Symbol[] {startSymbol, aToken}, startSymbol, new[] {
+			startSymbolToNothing,
+			startSymbolToStartSymbolAndA
+		});
+		[Test] public void StartSymbolAndEmptyStringProducingGrammarTest () {
+			var parser = new Slr1Parser<ExampleSemanticNode>(
+				startSymbolProducingAndEmptyStringGrammar,
+				toLex => toLex.Select(c => new Lexeme(aToken, "" + c)),
+				lexeme => new ExampleSemanticNode(),
+				(reduction, productSemantics) => new ExampleSemanticNode {children = productSemantics}
+			);
+			// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+			parser.Parse("a");
+			parser.Parse("aa");
+			// ReSharper restore ReturnValueOfPureMethodIsNotUsed
 		}
 	}
 }
